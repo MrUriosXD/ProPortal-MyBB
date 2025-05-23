@@ -1,11 +1,13 @@
 # ProPortal 1.0 para MyBB
 
-**ProPortal 1.0** es una extensión para MyBB que transforma el portal estándar en una página de inicio vibrante y fácil de personalizar. Con ProPortal, los administradores pueden ofrecer a su comunidad una experiencia única, mostrando hilos recientes, noticias, estadísticas o encuestas en bloques y columnas flexibles. Todo se configura desde el panel de administración, sin complicaciones.
+**ProPortal 1.0** es una extensión para MyBB que transforma el portal estándar en una página de inicio vibrante y fácil de personalizar. 
+Con ello, los administradores pueden ofrecer a su comunidad una experiencia única, mostrando hilos recientes, noticias, estadísticas, encuestas, entre otros bloques.
+Es por ello que hay que contar, que todo se configura desde el panel de administración en la pestaña de ProPortal.
 
 ## Características
 
 - **Columnas configurables**: Organiza el portal en columnas (izquierda, centro, derecha) con diseño ajustable.
-- **Columnas superior e inferior**: Activa o desactiva las columnas "Top" y "Bottom" con checkboxes para mayor flexibilidad.
+- **Columnas superior e inferior**: Activa o desactiva las columnas superior, la inferior, ambas o ninguna, mediante checkboxes en el panel de administración..
 - **Bloques personalizados**: Añade contenido estático o dinámico, como anuncios, últimos mensajes o bloques con PHP.
 - **Permisos por grupos**: Define qué grupos de usuarios ven cada bloque, ideal para contenido exclusivo.
 - **Páginas personalizadas**: Crea páginas adicionales dentro del portal para contenido único.
@@ -64,7 +66,9 @@ Para desinstalar ProPortal 1.0:
 
 ## Soporte
 
-ProPortal se originó en los foros de [ProMyBB](http://www.promybb.com), pero el desarrollador original, Adnan TOPAL, dejó de participar hace años, dejando la extensión sin un espacio oficial de soporte. Si ProPortal crece en popularidad, planeamos crear un foro de soporte financiado por donaciones y un hosting dedicado, según la demanda de la comunidad. Por ahora, GitHub es el centro para asistencia: abre un *issue* para reportar problemas o sugiere mejoras contribuyendo al proyecto.
+ProPortal se originó en los foros de [ProMyBB](http://www.promybb.com), pero el desarrollador original, Adnan TOPAL, dejó de participar hace años, dejando la extensión sin un espacio oficial de soporte. 
+Si ProPortal crece en popularidad, planeamos crear un foro de soporte financiado por donaciones y un hosting dedicado, según la demanda de la comunidad. 
+Por ahora, te invitamos a reportar problemas o sugerencias abriendo un *issue* en este repositorio o contribuyendo al proyecto.
 
 ## Contribuciones
 
