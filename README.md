@@ -25,9 +25,9 @@ Es por ello que hay que contar, que todo se configura desde el panel de administ
   | <img src="https://placehold.co/400x250?text=Info+ProPortal" width="400"/> | <img src="https://placehold.co/400x250?text=Configuraci%C3%B3n+ProPortal" width="400"/> | <img src="https://placehold.co/400x250?text=Gesti%C3%B3n+de+Bloques" width="400"/> | <img src="https://placehold.co/400x250?text=Vista+General+ProPortal" width="400"/> |
 
 </details>
-## Galería avanzada
-
-[Ver galería interactiva con JavaScript](docs/galeria.html)
+| Ejemplo HTML             | Ejemplo PHP            |
+|--------------------------|------------------------|
+| ```html<br><div>Hola</div><br>``` | ```php<br><?php echo "Hola"; ?><br>``` |
 
 ## Requisitos
 
