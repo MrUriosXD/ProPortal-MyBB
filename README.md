@@ -20,7 +20,7 @@ Es por ello que hay que contar, que todo se configura desde el panel de administ
 
 - MyBB 1.8.38 (recomendado para un rendimiento óptimo; compatible con 1.6.x y 1.8.x, verifica tu versión).
 - Servidor web con soporte para PHP y MySQL.
-- Acceso de escritura en la carpeta raíz del foro y en `portal/install/` para la instalación.
+- Acceso de escritura en la carpeta raíz del foro y en `proportal/install/` para la instalación.
 
 ## Instalación
 
@@ -29,8 +29,8 @@ El proceso de instalación de ProPortal 1.0 es directo:
 1. Haz una copia de seguridad de tu archivo `portal.php`.
 2. Descarga y descomprime el archivo de ProPortal 1.0.
 3. Sube el contenido de la carpeta `Upload` a la raíz de tu foro MyBB.
-4. Asegúrate de que la carpeta `portal/install/` tenga permisos de escritura.
-5. Accede al asistente de instalación en `[tu-dominio]/portal/install/index.php`.
+4. Asegúrate de que la carpeta `proportal/install/` tenga permisos de escritura.
+5. Accede al asistente de instalación en `[tu-dominio]/proportal/install/index.php`.
 6. Sigue las instrucciones del asistente para completar la instalación.
 7. Visita tu nuevo portal en `[tu-dominio]/portal.php`.
 
@@ -38,6 +38,7 @@ El proceso de instalación de ProPortal 1.0 es directo:
 
 Para habilitar URLs amigables en las páginas del portal, añade esta regla a tu archivo `.htaccess`:
 
+Esto no existe, lo hemos quitado por ahora los pages.
 ```apache
 RewriteRule ^page-([0-9A-Za-z]+)\.html$ portal.php?pages=$1 [L,QSA]
 ```
@@ -55,8 +56,8 @@ DirectoryIndex portal.php
 Para desinstalar ProPortal 1.0:
 
 1. Elimina el archivo `lock` de la carpeta `portal/install/`.
-2. Asegúrate de que la carpeta `portal/install/` tenga permisos de escritura.
-3. Accede al asistente de desinstalación en `[tu-dominio]/portal/install/uninstall.php`.
+2. Asegúrate de que la carpeta `proportal/install/` tenga permisos de escritura.
+3. Accede al asistente de desinstalación en `[tu-dominio]/proportal/install/uninstall.php`.
 4. Haz clic en "Siguiente" para que el asistente elimine los datos de ProPortal, respaldándolos en la carpeta de instalación.
 5. Elimina manualmente los archivos de ProPortal de tu servidor.
 
