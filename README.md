@@ -22,13 +22,9 @@ Es por ello que hay que contar, que todo se configura desde el panel de administ
 
   | Información del ProPortal | Configuración del ProPortal | Gestión de Bloques | Vista General del ProPortal |
   |:------------------------:|:--------------------------:|:------------------:|:--------------------------:|
-  | <img src="https://placehold.co/400x250?text=Info+ProPortal" width="400"/> | <img src="https://placehold.co/400x250?text=Configuraci%C3%B3n+ProPortal" width="400"/> | <img src="https://placehold.co/400x250?text=Gesti%C3%B3n+de+Bloques" width="400"/> | <img src="https://placehold.co/400x250?text=Vista+General+ProPortal" width="400"/> |
+  | <img src="https://github.com/user-attachments/assets/38548ec4-16d3-4e66-bf85-78c6c0565b8d" width="400"/> | <img src="https://github.com/user-attachments/assets/3148ab17-b8c0-4a11-b541-036b81b3f8fa" width="400"/> | <img src="https://github.com/user-attachments/assets/d24642da-d167-4a71-a667-c91ca9f5df3d" width="400"/> | <img src="https://github.com/user-attachments/assets/3c80633d-973c-41f3-9466-2e23e7483d71" width="400"/> |
 
 </details>
-![screencapture-localhost-defaultportal-admin-index-php-2025-07-02-15_43_15](https://github.com/user-attachments/assets/38548ec4-16d3-4e66-bf85-78c6c0565b8d)
-![screencapture-localhost-defaultportal-admin-index-php-2025-07-02-15_43_49](https://github.com/user-attachments/assets/3148ab17-b8c0-4a11-b541-036b81b3f8fa)
-![screencapture-localhost-defaultportal-admin-index-php-2025-07-02-15_44_19](https://github.com/user-attachments/assets/d24642da-d167-4a71-a667-c91ca9f5df3d)
-![screencapture-localhost-defaultportal-portal-php-2025-07-02-15_46_09](https://github.com/user-attachments/assets/3c80633d-973c-41f3-9466-2e23e7483d71)
 
 ## Requisitos
 
