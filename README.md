@@ -15,6 +15,16 @@ Es por ello que hay que contar, que todo se configura desde el panel de administ
 - **Control de avatares**: Activa o desactiva globalmente la visualización de avatares en el portal.
 - **Colores de grupo**: Habilita o desactiva los colores de los grupos de usuarios para un diseño uniforme.
 - **Instalación sencilla**: Incluye un asistente accesible vía `[tu-dominio]/portal/install/index.php`.
+## Galería de Capturas
+
+<details>
+  <summary>Haz clic para ver las capturas de pantalla</summary>
+
+  | Información del ProPortal | Configuración del ProPortal | Gestión de Bloques | Vista General del ProPortal |
+  |:------------------------:|:--------------------------:|:------------------:|:--------------------------:|
+  | <img src="https://placehold.co/400x250?text=Info+ProPortal" width="400"/> | <img src="https://placehold.co/400x250?text=Configuraci%C3%B3n+ProPortal" width="400"/> | <img src="https://placehold.co/400x250?text=Gesti%C3%B3n+de+Bloques" width="400"/> | <img src="https://placehold.co/400x250?text=Vista+General+ProPortal" width="400"/> |
+
+</details>
 
 ## Requisitos
 
