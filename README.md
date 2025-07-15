@@ -76,23 +76,23 @@ DirectoryIndex portal.php
 
 Para desinstalar ProPortal 1.0:
 
-1. 🗑️ Elimina el archivo `lock` de la carpeta `portal/install/`.
-2. ✍️ Asegúrate de que la carpeta `proportal/install/` tenga permisos de escritura.
-3. 🛠️ Accede al asistente de desinstalación en `[tu-dominio]/proportal/install/uninstall.php`.
-4. 🔄 Haz clic en "Siguiente" para que el asistente elimine los datos de ProPortal, respaldándolos en la carpeta de instalación.
-5. 📤 Elimina manualmente los archivos de ProPortal de tu servidor.
+1. 🗑️ Elimina el archivo `lock` de la carpeta `[tu-dominio]/proportal/install/` y manten el archivo `installed` para proceder con la desinstalación .
+2. ✍️ Asegúrate de que la carpeta `[tu-dominio]/proportal/install/` tenga permisos de escritura.
+3. 🛠️ Accede al instalador desde `[tu-dominio]/proportal/install/index.php` y sigue los pasos.  
+4. 📤 Elimina manualmente los archivos de ProPortal de tu servidor para proceder con la desinstalacion por completo.
 
 ---
 
 ## ⚠️ Notas Importantes
 
-- 🧩 **Compatibilidad**: ProPortal 1.0 es compatible con MyBB 1.8.38, la versión actual de MyBB. Usa esta versión para un rendimiento óptimo.
+- 🧩 **Compatibilidad**: ProPortal 1.0 es compatible con MyBB 1.8.39, la versión actual de MyBB. Usa esta versión para un rendimiento óptimo.
 
 ---
 
 ## 🆘 Soporte
 
-ProPortal se originó en los foros de [ProMyBB](http://www.promybb.com), pero el desarrollador original, Adnan TOPAL, dejó de participar hace años, dejando la extensión sin un espacio oficial de soporte.  
+ProPortal se originó en los foros de [ProMyBB](http://www.promybb.com), pero el desarrollador original, Adnan TOPAL, dejó de participar hace años, dejando la extensión sin un espacio oficial de soporte.
+
 Si ProPortal crece en popularidad, planeamos crear un foro de soporte financiado por donaciones y un hosting dedicado, según la demanda de la comunidad.  
 Por ahora, te invitamos a reportar problemas o sugerencias abriendo un *issue* en este repositorio o contribuyendo al proyecto.
 
