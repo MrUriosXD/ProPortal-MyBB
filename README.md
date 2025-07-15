@@ -120,7 +120,7 @@ ProPortal 1.0 fue creado por Adnan TOPAL, © 2010.
 
 ## 🏷️ Créditos y Modificaciones
 
-Esta versión de ProPortal ha sido adaptada y optimizada por **MrUriosXD**, basada en la versión **1.0.0 beta** e incorporando inspiración de las mejoras de la versión **2.6.2**, desarrollada por otro autor.  
+Esta versión de ProPortal ha sido adaptada y optimizada por **MrUriosXD**, basada en la versión **1.0.0 beta** e incorporando inspiración de las mejoras de la versión **2.6.2**, desarrollada por otro autor llamado [MrBrechreiz](https://www.mybb.de/forum/user-5076.html).  
 Las actualizaciones incluyen compatibilidad con MyBB 1.8.38 y mejoras en la estabilidad, preservando la esencia original de la extensión.
 
 ---
