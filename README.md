@@ -132,10 +132,12 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 
 ### 🛠️ Adaptación y mejoras por MrUriosXD
 
-**Autor**: MrUriosXD  
-**Versión adaptada**: Personalizada  
-**Compatibilidad**: MyBB 1.8.39  
-**PHP**: Adaptado completamente a PHP 8.2
+- **Autor**: MrUriosXD  
+- **Versión adaptada**: 1.0.0 (100)
+- **Ultima Actualizacion**:	Aun no tiene version a el publico
+
+- **Compatibilidad**: MyBB 1.8.39  
+- **PHP**: Adaptado completamente a PHP 8.2
 
 #### Cambios realizados:
 - Compatibilidad completa con **MyBB 1.8.39**
