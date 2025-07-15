@@ -123,10 +123,9 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 ---
 
 ### 💡 Inspiración adicional
-
-- **Versión**: ProPortal 2.6.2
+- **Autor**: [MrBrechreiz](https://www.mybb.de/forum/user-5076.html)
 - **Ultima Actualizacion**:	25/02/2018
-- **Autor**: [MrBrechreiz](https://www.mybb.de/forum/user-5076.html)  
+- **Versión**: ProPortal 2.6.2
 - **Descripción**: Se han tomado ideas y mejoras puntuales de esta versión para complementar el desarrollo.
 
 ---
