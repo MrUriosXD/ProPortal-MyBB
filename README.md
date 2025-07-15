@@ -116,7 +116,7 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 
 ### 👤 Autor original (versión base)
 
-**ProPortal 1.0 beta** fue creado por **Adnan TOPAL**, © 2010  
+**ProPortal 1.0 beta** fue creado por **Adnan TOPAL** o mas conocido como **DragonFever**, © 2010  
 Desarrollador original de la extensión **ProPortal** para **MyBB**.
 
 ---
