@@ -135,16 +135,14 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 - **Autor**: MrUriosXD  
 - **Versión adaptada**: 1.0.0 (100)
 - **Ultima Actualizacion**:	Aun no tiene version a el publico
-
 - **Compatibilidad**: MyBB 1.8.39  
 - **PHP**: Adaptado completamente a PHP 8.2
 
 #### Cambios realizados:
-- Compatibilidad completa con **MyBB 1.8.39**
+- Conservación de la estructura y esencia del desarrollo original
 - Adaptación a **PHP 8.2** para entornos modernos
 - Correcciones de errores y mejoras de estabilidad
 - Limpieza y optimización del código
-- Conservación de la estructura y esencia del desarrollo original
 
 ---
 
