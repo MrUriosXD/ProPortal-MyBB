@@ -114,14 +114,44 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 
 ## 👤 Autor
 
-ProPortal 1.0 fue creado por Adnan TOPAL, © 2010.
+**ProPortal 1.0** fue creado por **Adnan TOPAL**, © 2010.
 
 ---
 
 ## 🏷️ Créditos y Modificaciones
 
-Esta versión de ProPortal ha sido adaptada y optimizada por **MrUriosXD**, basada en la versión **1.0.0 beta** e incorporando inspiración de las mejoras de la versión **2.6.2**, desarrollada por otro autor llamado [MrBrechreiz](https://www.mybb.de/forum/user-5076.html).  
-Las actualizaciones incluyen compatibilidad con MyBB 1.8.38 y mejoras en la estabilidad, preservando la esencia original de la extensión.
+### 🔹 Autor original (versión base)
+- **Nombre**: Adnan TOPAL  
+- **Versión utilizada como base**: 1.0.0 beta  
+- **Descripción**: Desarrollador original de la extensión **ProPortal** para MyBB.
+
+---
+
+### 🔹 Inspiración adicional
+- **Autor**: [MrBrechreiz](https://www.mybb.de/forum/user-5076.html)  
+- **Versión**: 2.6.2  
+- **Descripción**: Se han tomado ideas y mejoras específicas de esta versión para complementar el desarrollo.
+
+---
+
+### 🔹 Adaptación y mejoras actuales
+- **Autor**: MrUriosXD  
+- **Versión adaptada**: Personalizada  
+- **Compatibilidad**: MyBB 1.8.39  
+- **PHP**: Adaptado completamente a PHP 8.2
+
+#### 🛠️ Cambios realizados por MrUriosXD:
+- Compatibilidad total con **MyBB 1.8.39**
+- Adaptación completa a **PHP 8.2**
+- Mejoras de estabilidad y rendimiento
+- Conservación de la estructura y esencia original del portal
+
+---
+
+### 📌 Objetivo
+Ofrecer una versión moderna, funcional y estable de **ProPortal**, manteniendo el espíritu del desarrollo original y optimizándola para entornos actuales.
+
+----------------------------------------
 
 ---
 
