@@ -112,44 +112,43 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 
 ---
 
-## 👤 Autor
-
-**ProPortal 1.0** fue creado por **Adnan TOPAL**, © 2010.
-
----
-
 ## 🏷️ Créditos y Modificaciones
 
-### 🔹 Autor original (versión base)
-- **Nombre**: Adnan TOPAL  
-- **Versión utilizada como base**: 1.0.0 beta  
-- **Descripción**: Desarrollador original de la extensión **ProPortal** para MyBB.
+### 👤 Autor original (versión base)
+
+**ProPortal 1.0 beta** fue creado por **Adnan TOPAL**, © 2010  
+Desarrollador original de la extensión **ProPortal** para **MyBB**.
 
 ---
 
-### 🔹 Inspiración adicional
-- **Autor**: [MrBrechreiz](https://www.mybb.de/forum/user-5076.html)  
-- **Versión**: 2.6.2  
-- **Descripción**: Se han tomado ideas y mejoras específicas de esta versión para complementar el desarrollo.
+### 💡 Inspiración adicional
+
+**Versión**: ProPortal 2.6.2  
+**Autor**: [MrBrechreiz](https://www.mybb.de/forum/user-5076.html)  
+Se han tomado ideas y mejoras puntuales de esta versión para complementar el desarrollo.
 
 ---
 
-### 🔹 Adaptación y mejoras actuales
-- **Autor**: MrUriosXD  
-- **Versión adaptada**: Personalizada  
-- **Compatibilidad**: MyBB 1.8.39  
-- **PHP**: Adaptado completamente a PHP 8.2
+### 🛠️ Adaptación y mejoras por MrUriosXD
 
-#### 🛠️ Cambios realizados por MrUriosXD:
-- Compatibilidad total con **MyBB 1.8.39**
-- Adaptación completa a **PHP 8.2**
-- Mejoras de estabilidad y rendimiento
-- Conservación de la estructura y esencia original del portal
+**Autor**: MrUriosXD  
+**Versión adaptada**: Personalizada  
+**Compatibilidad**: MyBB 1.8.39  
+**PHP**: Adaptado completamente a PHP 8.2
+
+#### Cambios realizados:
+- Compatibilidad completa con **MyBB 1.8.39**
+- Adaptación a **PHP 8.2** para entornos modernos
+- Correcciones de errores y mejoras de estabilidad
+- Limpieza y optimización del código
+- Conservación de la estructura y esencia del desarrollo original
 
 ---
 
-### 📌 Objetivo
-Ofrecer una versión moderna, funcional y estable de **ProPortal**, manteniendo el espíritu del desarrollo original y optimizándola para entornos actuales.
+### 🎯 Objetivo
+
+Esta versión busca ofrecer una edición moderna, funcional y estable de **ProPortal**, fiel al espíritu original, pero adaptada a las necesidades y tecnologías actuales.
+
 
 ----------------------------------------
 
