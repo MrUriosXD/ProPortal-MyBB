@@ -140,7 +140,6 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 
 #### Cambios realizados:
 - Conservación de la estructura y esencia del desarrollo original
-- Adaptación a **PHP 8.2** para entornos modernos
 - Correcciones de errores y mejoras de estabilidad
 - Limpieza y optimización del código
 
