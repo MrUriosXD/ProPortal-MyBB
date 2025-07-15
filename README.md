@@ -127,7 +127,7 @@ Las actualizaciones incluyen compatibilidad con MyBB 1.8.38 y mejoras en la esta
 
 ## 📜 Licencia
 
-Este proyecto no especifica una licencia explícita en la documentación original. En ausencia de términos claros, se recomienda asumir restricciones estándar (por ejemplo, uso personal o no comercial) y proceder con precaución.
+Este proyecto está licenciado bajo la licencia [Atribución-NoComercial-CompartirIgual 3.0 No Adaptada (CC BY-NC-SA 3.0)](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.es).
 
 ---
 
