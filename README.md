@@ -31,11 +31,6 @@ Todo se configura desde el panel de administración en la pestaña de ProPortal.
 
 </details>
 
-<img width="1360" height="880" alt="screencapture-localhost-defaultportal-admin-index-php-2025-09-27-15_47_47" src="https://github.com/user-attachments/assets/dac03a74-aee1-4dd9-8294-65bc171f2dff" />
-<img width="1360" height="1506" alt="screencapture-localhost-defaultportal-admin-index-php-2025-09-27-15_49_27" src="https://github.com/user-attachments/assets/944ca764-e678-497d-ba67-f4a511261d31" />
-<img width="1360" height="1334" alt="screencapture-localhost-defaultportal-admin-index-php-2025-09-27-15_49_42" src="https://github.com/user-attachments/assets/d6bdf3ed-dc7f-420d-9af7-29f8bc95d0a6" />
-<img width="1360" height="936" alt="screencapture-localhost-defaultportal-admin-index-php-2025-09-27-15_49_56" src="https://github.com/user-attachments/assets/02a9f6bc-e498-4c8b-ac74-59c77769eb17" />
-<img width="1360" height="599" alt="screencapture-localhost-defaultportal-admin-index-php-2025-09-27-15_52_53" src="https://github.com/user-attachments/assets/b8d9f410-609f-4870-af4d-ef57f33dce8d" />
 ---
 
 ## 📋 Requisitos
