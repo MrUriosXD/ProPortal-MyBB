@@ -25,11 +25,12 @@ Todo se configura desde el panel de administración en la pestaña de ProPortal.
 <details>
   <summary>Haz clic para ver las capturas de pantalla</summary>
 
-  | ℹ️ Información del ProPortal | ⚙️ Configuración del ProPortal | 🧮 Gestión de Bloques | 🏠 Vista General del ProPortal |
-  |:---------------------------:|:-----------------------------:|:--------------------:|:-----------------------------:|
-  | <img src="https://github.com/user-attachments/assets/38548ec4-16d3-4e66-bf85-78c6c0565b8d" width="400"/> | <img src="https://github.com/user-attachments/assets/3148ab17-b8c0-4a11-b541-036b81b3f8fa" width="400"/> | <img src="https://github.com/user-attachments/assets/d24642da-d167-4a71-a667-c91ca9f5df3d" width="400"/> | <img src="https://github.com/user-attachments/assets/3c80633d-973c-41f3-9466-2e23e7483d71" width="400"/> |
+  | ℹ️ Información del ProPortal | ⚙️ Configuración del ProPortal | 🧮 Gestión de Bloques | 🏠 Vista General del ProPortal | 📊 Estadísticas | 📝 Reportes |
+  |:---------------------------:|:-----------------------------:|:--------------------:|:-----------------------------:|:----------------:|:-----------:|
+  | <img src="URL_DE_LA_IMAGEN1" width="400"/> | <img src="URL_DE_LA_IMAGEN2" width="400"/> | <img src="URL_DE_LA_IMAGEN3" width="400"/> | <img src="URL_DE_LA_IMAGEN4" width="400"/> | <img src="URL_DE_LA_IMAGEN5" width="400"/> | <img src="URL_DE_LA_IMAGEN6" width="400"/> |
 
 </details>
+
 
 ---
 
