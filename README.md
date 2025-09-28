@@ -25,9 +25,14 @@ Todo se configura desde el panel de administración en la pestaña de ProPortal.
 <details>
   <summary>Haz clic para ver las capturas de pantalla</summary>
 
-  | ℹ️ Información del ProPortal | ⚙️ Configuración del ProPortal | 🧮 Gestión de Bloques | 🏠 Vista General del ProPortal |
-  |:---------------------------:|:-----------------------------:|:--------------------:|:-----------------------------:|
-  | <img src="https://github.com/user-attachments/assets/38548ec4-16d3-4e66-bf85-78c6c0565b8d" width="400"/> | <img src="https://github.com/user-attachments/assets/3148ab17-b8c0-4a11-b541-036b81b3f8fa" width="400"/> | <img src="https://github.com/user-attachments/assets/d24642da-d167-4a71-a667-c91ca9f5df3d" width="400"/> | <img src="https://github.com/user-attachments/assets/3c80633d-973c-41f3-9466-2e23e7483d71" width="400"/> |
+  | ℹ️ Información del ProPortal | ⚙️ Configuración del ProPortal | 🧮 Gestión de Bloques |
+  |:---------------------------:|:-----------------------------:|:--------------------:|
+  | <img src="https://github.com/user-attachments/assets/dac03a74-aee1-4dd9-8294-65bc171f2dff" width="300"/> | <img src="https://github.com/user-attachments/assets/944ca764-e678-497d-ba67-f4a511261d31" width="300"/> | <img src="https://github.com/user-attachments/assets/d6bdf3ed-dc7f-420d-9af7-29f8bc95d0a6" width="300"/> |
+
+  | ⚙️ Configuración de Bloques | 🖼️ Vista de Banners | 🏠 Vista General del ProPortal |
+  |:-----------------------------:|:----------------:|:-----------:|
+  | <img src="https://github.com/user-attachments/assets/02a9f6bc-e498-4c8b-ac74-59c77769eb17" width="300"/> | <img src="https://github.com/user-attachments/assets/b8d9f410-609f-4870-af4d-ef57f33dce8d" width="300"/> | <img src="https://github.com/user-attachments/assets/bc9ab518-9905-4091-9915-9ee612ada135" width="300"/> |
+
 
 </details>
 
@@ -76,23 +81,23 @@ DirectoryIndex portal.php
 
 Para desinstalar ProPortal 1.0:
 
-1. 🗑️ Elimina el archivo `lock` de la carpeta `portal/install/`.
-2. ✍️ Asegúrate de que la carpeta `proportal/install/` tenga permisos de escritura.
-3. 🛠️ Accede al asistente de desinstalación en `[tu-dominio]/proportal/install/uninstall.php`.
-4. 🔄 Haz clic en "Siguiente" para que el asistente elimine los datos de ProPortal, respaldándolos en la carpeta de instalación.
-5. 📤 Elimina manualmente los archivos de ProPortal de tu servidor.
+1. 🗑️ Elimina el archivo `lock` de la carpeta `[tu-dominio]/proportal/install/` y manten el archivo `installed` para proceder con la desinstalación .
+2. ✍️ Asegúrate de que la carpeta `[tu-dominio]/proportal/install/` tenga permisos de escritura.
+3. 🛠️ Accede al instalador desde `[tu-dominio]/proportal/install/index.php` y sigue los pasos.  
+4. 📤 Elimina manualmente los archivos de ProPortal de tu servidor para proceder con la desinstalacion por completo.
 
 ---
 
 ## ⚠️ Notas Importantes
 
-- 🧩 **Compatibilidad**: ProPortal 1.0 es compatible con MyBB 1.8.38, la versión actual de MyBB. Usa esta versión para un rendimiento óptimo.
+- 🧩 **Compatibilidad**: ProPortal 1.0 es compatible con MyBB 1.8.39, la versión actual de MyBB. Usa esta versión para un rendimiento óptimo.
 
 ---
 
 ## 🆘 Soporte
 
-ProPortal se originó en los foros de [ProMyBB](http://www.promybb.com), pero el desarrollador original, Adnan TOPAL, dejó de participar hace años, dejando la extensión sin un espacio oficial de soporte.  
+ProPortal se originó en los foros de [ProMyBB](http://www.promybb.com), pero el desarrollador original, Adnan TOPAL, dejó de participar hace años, dejando la extensión sin un espacio oficial de soporte.
+
 Si ProPortal crece en popularidad, planeamos crear un foro de soporte financiado por donaciones y un hosting dedicado, según la demanda de la comunidad.  
 Por ahora, te invitamos a reportar problemas o sugerencias abriendo un *issue* en este repositorio o contribuyendo al proyecto.
 
@@ -112,22 +117,51 @@ Sigue las guías de estilo de MyBB y prueba tus cambios en un entorno de desarro
 
 ---
 
-## 👤 Autor
+## 🏷️ Créditos y Modificaciones
 
-ProPortal 1.0 fue creado por Adnan TOPAL, © 2010.
+### 👤 Autor original (versión base)
+- **Nombre**: Adnan TOPAL  (Conocido como **DragonFever**)
+- **Ultima Actualizacion**: 14/01/2010
+- **Versión Base**: 1.0.0 beta  
+- **Descripción**: Desarrollador original de la extensión **ProPortal** para MyBB.
 
 ---
 
-## 🏷️ Créditos y Modificaciones
+### 💡 Inspiración adicional
+- **Autor**: [MrBrechreiz](https://www.mybb.de/forum/user-5076.html)
+- **Ultima Actualizacion**:	25/02/2018
+- **Versión**: ProPortal 2.6.2
+- **Descripción**: Se han tomado ideas y mejoras puntuales de esta versión para complementar el desarrollo.
 
-Esta versión de ProPortal ha sido adaptada y optimizada por **MrUriosXD**, basada en la versión **1.0.0 beta** e incorporando inspiración de las mejoras de la versión **2.6.2**, desarrollada por otro autor.  
-Las actualizaciones incluyen compatibilidad con MyBB 1.8.38 y mejoras en la estabilidad, preservando la esencia original de la extensión.
+---
+
+### 🛠️ Adaptación y mejoras por MrUriosXD
+
+- **Autor**: MrUriosXD  
+- **Versión adaptada**: 1.0.0 (100)
+- **Ultima Actualizacion**:	Aun no tiene version a el publico
+- **Compatibilidad**: MyBB 1.8.39  
+- **PHP**: Adaptado completamente a PHP 8.2
+
+#### Cambios realizados:
+- Conservación de la estructura y esencia del desarrollo original
+- Correcciones de errores y mejoras de estabilidad
+- Limpieza y optimización del código
+
+---
+
+### 🎯 Objetivo
+
+Esta versión busca ofrecer una edición moderna, funcional y estable de **ProPortal**, fiel al espíritu original, pero adaptada a las necesidades y tecnologías actuales.
+
+
+----------------------------------------
 
 ---
 
 ## 📜 Licencia
 
-Este proyecto no especifica una licencia explícita en la documentación original. En ausencia de términos claros, se recomienda asumir restricciones estándar (por ejemplo, uso personal o no comercial) y proceder con precaución.
+Este proyecto está licenciado bajo la licencia [Atribución-NoComercial-CompartirIgual 3.0 No Adaptada (CC BY-NC-SA 3.0)](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.es).
 
 ---
 
