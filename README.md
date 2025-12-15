@@ -1,4 +1,7 @@
-# ProPortal 1.0 para MyBB
+# ProPortal 1.0 para MyBB 🚧 **TODAVÍA EN DESARROLLO** 🚧  
+> Esta extensión aun esta proceso de desarrollo activo y **aún no está listo para su lanzamiento público**.  
+> Cabe mencionar que habran muchas actualizaciones, y que el codigo aun esta en proceso.
+
 
 **ProPortal 1.0** es una extensión para MyBB que transforma el portal estándar en una página de inicio vibrante y fácil de personalizar.  
 Con ello, los administradores pueden ofrecer a su comunidad una experiencia única, mostrando hilos recientes, noticias, estadísticas, encuestas, entre otros bloques.  
