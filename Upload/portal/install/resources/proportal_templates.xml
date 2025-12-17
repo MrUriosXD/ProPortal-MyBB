@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="MyBB Master Style" version="1400">
+	<templates>
+			<template name="pro_portal" version="1400"><![CDATA[<html>
+<head>
+<title>{$mybb->settings['bbname']}</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+<table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tr>
+<td valign="top" width="{$proportal->settings['leftcolwidth']}" style="padding-right:{$proportal->settings['verticalspace']}px">
+{$leftblocks}
+</td>
+<td valign="top">
+{$centerblocks}
+</td>
+<td valign="top" width="{$proportal->settings['rightcolwidth']}" style="padding-left:{$proportal->settings['verticalspace']}px">
+{$rightblocks}
+</td>
+</tr>
+</table>
+<table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tr>
+<td align="center" width="100%" class="smalltext"><a href="http://www.promybb.com/" target="_blank">Pro Portal 1.0</a> &copy; 2010 <a href="http://atopal.com/" target="_blank">Adnan TOPAL</a></td>
+</tr>
+</table>
+{$footer}
+</body>
+</html>]]></template>
+			<template name="pro_portal_announcement" version="1400"><![CDATA[<table cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+<tr>
+<td class="thead"><strong>{$icon} <a href="{$mybb->settings['bburl']}/{$announcement['threadlink']}">{$announcement['subject']}</a></strong></td>
+</tr>
+<tr>
+<td class="trow2" align="right" valign="middle">
+<span style="float: left;">{$avatar}</span>
+<span class="smalltext">{$lang->posted_by} {$profilelink} - {$anndate} {$anntime}<br />{$views} {$numcomments}</span>
+</td>
+</tr>
+<tr>
+<td class="trow1">
+<table border="0" cellpadding="{$theme['tablespace']}" width="100%">
+	<tr>
+		<td class="trow1" style="border: 0px;">
+			<p style="margin: -2px 0;">
+				{$message}
+			</p>
+			{$post['attachments']}
+		</td>
+	</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td class="trow2" align="right" valign="middle">
+<span class="smalltext">
+<a href="{$mybb->settings['bburl']}/printthread.php?tid={$announcement['tid']}"><img src="{$mybb->settings['bburl']}/{$theme['imgdir']}/printable.gif" alt="{$lang->print_this_item}" title="{$lang->print_this_item}" /></a>&nbsp;<a href="{$mybb->settings['bburl']}/sendthread.php?tid={$announcement['tid']}"><img src="{$mybb->settings['bburl']}/{$theme['imgdir']}/send.gif" alt="{$lang->send_to_friend}" title="{$lang->send_to_friend}" /></a>
+</span>
+</td>
+</tr>
+</table>
+<br />]]></template>
+			<template name="pro_portal_block" version="1400"><![CDATA[<div style="padding-bottom:{$proportal->settings['horizontalspace']}px;">
+<table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+<tr>
+<td class="thead"><div class="expcolimage"><img src="{$theme['imgdir']}/{$expcolimage}" id="block_{$result_blocks['id']}_img" class="expander" alt="{$expaltext}" title="{$expaltext}" /></div><strong>{$title}</strong></td>
+</tr>
+<tbody style="{$expdisplay}" id="block_{$result_blocks['id']}_e">
+<tr>
+<td class="trow1">
+{$content}
+</td>
+</tr>
+</tbody>
+</table>
+</div>]]></template>
+			<template name="pro_portal_left" version="1400"><![CDATA[<html>
+<head>
+<title>{$mybb->settings['bbname']}</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+<table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tr>
+<td valign="top" width="{$proportal->settings['leftcolwidth']}" style="padding-right:{$proportal->settings['verticalspace']}px">
+{$leftblocks}
+</td>
+<td valign="top">
+{$centerblocks}
+</td>
+</tr>
+</table>
+<table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tr>
+<td align="center" width="100%" class="smalltext"><a href="http://promybb.com/" target="_blank">Pro Portal 1.0</a> &copy; 2010 <a href="http://atopal.com/" target="_blank">DragonFever</a></td>
+</tr>
+</table>
+{$footer}
+</body>
+</html>]]></template>
+			<template name="pro_portal_page" version="1400"><![CDATA[<div style="padding-bottom:{$proportal->settings['horizontalspace']}px;">
+<table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+<tr>
+<td class="thead"><strong>{$title}</strong></td>
+</tr>
+<tbody>
+<tr>
+<td class="trow1">
+{$content}
+</td>
+</tr>
+</tbody>
+</table>
+</div>]]></template>
+			<template name="pro_portal_right" version="1400"><![CDATA[<html>
+<head>
+<title>{$mybb->settings['bbname']}</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+<table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tr>
+<td valign="top">
+{$centerblocks}
+</td>
+<td valign="top" width="{$proportal->settings['rightcolwidth']}" style="padding-left:{$proportal->settings['verticalspace']}px">
+{$rightblocks}
+</td>
+</tr>
+</table>
+<table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tr>
+<td align="center" width="100%" class="smalltext"><a href="http://promybb.com/" target="_blank">Pro Portal 1.0</a> &copy; 2010 <a href="http://atopal.com/" target="_blank">DragonFever</a></td>
+</tr>
+</table>
+{$footer}
+</body>
+</html>]]></template>
+	</templates>
+</theme>
