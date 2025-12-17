@@ -6,7 +6,8 @@
  * Website: http://www.promybb.com/
  * License: http://creativecommons.org/licenses/by-nc-sa/3.0/
  ***************************************************************/
- 
+
+$latestusers = "";
 $lualtbg = alt_trow();
 $query = $db->query("SELECT uid, username, regdate, avatar, avatardimensions, usergroup, displaygroup FROM ".TABLE_PREFIX."users ORDER by regdate DESC LIMIT 0, 10");
 while($user = $db->fetch_array($query))

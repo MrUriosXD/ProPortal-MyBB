@@ -13,6 +13,7 @@ if (!defined("IN_PORTAL")) {
 
 // Get forums user cannot view
 $unviewable = get_unviewable_forums();
+$unviewwhere = $last_thread = "";
 if($unviewable)
 {
 	$unviewwhere = " AND fid NOT IN ($unviewable)";

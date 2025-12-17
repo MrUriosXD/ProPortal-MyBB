@@ -86,7 +86,7 @@ if(!$mybb->input['action'])
 	
 	require_once MYBB_ROOT."inc/class_feedparser.php";
 	$feed_parser = new FeedParser();
-	$feed_parser->parse_feed("http://www.promybb.com/latest_news.php");
+	$feed_parser->parse_feed("https://feeds.feedburner.com/proportal");
 	
 	if($feed_parser->error == '')
 	{
@@ -101,9 +101,9 @@ if(!$mybb->input['action'])
 				$stamp = '';
 			}
 			
-			$content = $item['description'];
+			$description = "<span style=\"font-size: 12px;\">".htmlspecialchars_uni(strip_tags($item['description']))."</span>";
 			
-			$news .= "<p><span style=\"font-size: 16px;\"><strong>".$item['title']."</strong></span><br />{$stamp}<br /><br />{$content}<strong><br /><br /><a href=\"{$item['link']}\" target=\"_blank\">&raquo; {$lang->portal_read_more}</a></strong></p><hr />";
+			$news = "<p><span style=\"font-size: 16px;\"><strong>".$item['title']."</strong></span><br />{$stamp}<br /><br />{$description}<strong><br /><br /><a href=\"{$item['link']}\" target=\"_blank\">&raquo; {$lang->portal_read_more}</a></strong></p><hr />";
 		}
 	}
 	

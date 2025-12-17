@@ -204,6 +204,9 @@ if($mybb->input['action'] == "add")
 		$page_data['visible'] = "";
 	}
 	
+	$pageenabled_yes = [];
+	$pageenabled_no  = [];
+	
 	if($page_data['enabled'] == "0")
 	{
 		$pageenabled_no['checked'] = true;
@@ -319,6 +322,9 @@ if($mybb->input['action'] == "edit")
 		$page_data = $mybb->input;
 	}
 	
+	$pageenabled_yes = [];
+	$pageenabled_no  = [];
+	
 	if($page_data['enabled'] == "0")
 	{
 		$pageenabled_no['checked'] = true;
@@ -347,7 +353,7 @@ if($mybb->input['action'] == "edit")
 	$form_container->output_row($lang->portal_pages_name." <em>*</em>", $lang->portal_pages_name_desc, $form->generate_text_box('name', $page_data['name'], array('id' => 'name')), 'name');
 	$form_container->output_row($lang->portal_pages_content." <em>*</em>", "", $form->generate_text_area('content', $page_data['content'], array('id' => 'pcontent', 'style' => 'width: 650px; height: 350px;')), 'pcontent');
 	$form_container->output_row($lang->portal_pages_enabled, "", $form->generate_radio_button('enabled', '1', $lang->portal_pages_yes, $pageenabled_yes)."<br />\n".$form->generate_radio_button('enabled', '0', $lang->portal_pages_no, $pageenabled_no));
-	$form_container->output_row($lang->portal_pages_visible, $lang->portal_pages_visible_desc, $form->generate_select_box('visible[]', $usergroups, $page_data['visible'], array('checked' => $block_data['visible'], 'multiple' => 'multiple', 'id' => 'visible')), 'visible');
+	$form_container->output_row($lang->portal_pages_visible, $lang->portal_pages_visible_desc, $form->generate_select_box('visible[]', $usergroups, $page_data['visible'], array('multiple' => 'multiple', 'id' => 'visible')), 'visible');
 	
 	$form_container->end();
 	

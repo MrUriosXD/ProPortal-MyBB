@@ -12,7 +12,7 @@ if (!defined("IN_PORTAL")) {
 }
 
 // First, see what day this is.
-$bdaycount = 0; $bdayhidden = 0;
+$bdaycount = $bdayhidden = 0;
 $bdaytime = TIME_NOW;
 $bdaydate = my_date("j-n", $bdaytime, '', 0);
 $year = my_date("Y", $bdaytime, '', 0);
@@ -25,8 +25,8 @@ if(!is_array($bdaycache))
 	$bdaycache = $cache->read("birthdays");
 }
 
-$hiddencount = $bdaycache[$bdaydate]['hiddencount'];
-$today_bdays = $bdaycache[$bdaydate]['users'];
+$hiddencount = $bdaycache[$bdaydate]['hiddencount'] ?? 0;
+$today_bdays = $bdaycache[$bdaydate]['users'] ?? 0;
 
 $comma = '';
 if(!empty($today_bdays))

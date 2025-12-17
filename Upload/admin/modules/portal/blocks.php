@@ -225,7 +225,7 @@ if($mybb->input['action'] == "add")
 	$filearray = array();
 	$handle = opendir(MYBB_ROOT.'portal/blocks/');
 	while (false !== ($file = readdir($handle))) {
-		if ($file != "." AND $file != ".." AND !eregi("html",$file)) {
+		if ($file != "." AND $file != ".." AND !preg_match("/html/i", $file)) {
 			$file = str_replace("block_","",$file);
 			$file = str_replace(".php","",$file);
 			
@@ -367,7 +367,7 @@ if($mybb->input['action'] == "edit")
 	$filearray = array();
 	$handle = opendir(MYBB_ROOT.'portal/blocks/');
 	while (false !== ($file = readdir($handle))) {
-		if ($file != "." AND $file != ".." AND !eregi("html",$file) AND $file!="block_admin.php") {
+		if ($file != "." AND $file != ".." AND !preg_match("/html/i",$file) AND $file!="block_admin.php") {
 			$file = str_replace("block_","",$file);
 			$file = str_replace(".php","",$file);
 			
@@ -381,6 +381,9 @@ if($mybb->input['action'] == "edit")
 		$block_file[$file] = $file;
 	}
 	
+	$blockcustom_yes = [];
+	$blockcustom_no  = [];
+	
 	if($block_data['custom'] == "0")
 	{
 		$blockcustom_no['checked'] = true;
@@ -389,6 +392,9 @@ if($mybb->input['action'] == "edit")
 	{
 		$blockcustom_yes['checked'] = true;
 	}
+	
+	$blockenabled_yes = [];
+	$blockenabled_no  = [];
 	
 	if($block_data['enabled'] == "0")
 	{

@@ -31,8 +31,8 @@ while($forumrow = $db->fetch_array($query))
 
 // Let's add pagination
 $annnum = $db->fetch_field($db->simple_select('threads', 'COUNT(*) AS annnum', "fid IN (".$proportal->settings['announcementsfid'].") AND visible='1' AND closed NOT LIKE 'moved|%'"), 'annnum');
-$pagenum = intval($mybb->input['page']);
-$totalpage = ceil($annnum / $proportal->settings['numannouncements']);
+$pagenum = (int)($mybb->input['page'] ?? 1);
+$totalpage = (int)ceil($annnum / (int)$proportal->settings['numannouncements']);
 if($pagenum < 1 || !$pagenum || $pagenum > $totalpage){ $pagenum = 1; }
 $multipage = multipage($annnum, $proportal->settings['numannouncements'], $pagenum, $mybb->settings['bburl'].'/portal.php');
 

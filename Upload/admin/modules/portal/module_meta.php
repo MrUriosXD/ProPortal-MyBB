@@ -23,7 +23,7 @@ function portal_meta()
 	$sub_menu['30'] = array("id" => "pages", "title" => $lang->portal_page_management, "link" => "index.php?module=portal/pages");
 	$sub_menu['40'] = array("id" => "settings", "title" => $lang->portal_settings, "link" => "index.php?module=portal/settings");
 	
-	$plugins->run_hooks_by_ref("admin_portal_menu", $sub_menu);
+	$plugins->run_hooks("admin_portal_menu", $sub_menu);
 
 	$page->add_menu_item($lang->portal, "portal", "index.php?module=portal", 10, $sub_menu);
 
@@ -43,7 +43,7 @@ function portal_action_handler($action)
 		'info' => array('active' => 'info', 'file' => 'info.php')
 	);
 	
-	$plugins->run_hooks_by_ref("admin_portal_action_handler", $actions);
+	$plugins->run_hooks("admin_portal_action_handler", $actions);
 	
 	if(isset($actions[$action]))
 	{

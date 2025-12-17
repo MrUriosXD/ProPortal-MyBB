@@ -13,8 +13,8 @@ if (!defined("IN_PORTAL")) {
 
 $timesearch = TIME_NOW - $mybb->settings['wolcutoff'];
 $comma = '';
-$guestcount = 0;
-$membercount = 0;
+$guestcount = $membercount = $botcount = $anoncount = 0;
+
 $onlinemembers = '';
 $query = $db->query("
 	SELECT s.sid, s.ip, s.uid, s.time, s.location, u.username, u.invisible, u.usergroup, u.displaygroup
@@ -42,7 +42,7 @@ while($user = $db->fetch_array($query))
 	}
 	else
 	{
-		if($doneusers[$user['uid']] < $user['time'] || !$doneusers[$user['uid']])
+        if(!isset($doneusers[$user['uid']]) || $doneusers[$user['uid']] < $user['time'])
 		{
 			++$membercount;
 			

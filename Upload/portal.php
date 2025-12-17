@@ -11,6 +11,8 @@ define("IN_MYBB", 1);
 define("IN_PORTAL", 1);
 define('THIS_SCRIPT', 'portal.php');
 
+$leftblocks = $centerblocks = $rightblocks = "";
+
 // set the path to your forums directory here (without trailing slash)
 $forumdir = "./";
 
@@ -71,7 +73,7 @@ while($setting = $db->fetch_array($query))
 $proportal->settings = &$settings;
 
 // This allows users to login if the portal is stored offsite or in a different directory
-if($mybb->input['action'] == "do_login" && $mybb->request_method == "post")
+if(isset($mybb->input['action']) && $mybb->input['action'] == "do_login" && $mybb->request_method == "post")
 {
 	$plugins->run_hooks("portal_do_login_start");
 
@@ -122,7 +124,7 @@ if($mybb->input['action'] == "do_login" && $mybb->request_method == "post")
 }
 
 // Define portal-related seo urls
-if($mybb->settings['seourls'] == "yes" || ($mybb->settings['seourls'] == "auto" && $_SERVER['SEO_SUPPORT'] == 1))
+if($mybb->settings['seourls'] == "yes" || ($mybb->settings['seourls'] == "auto" && !empty($_SERVER['SEO_SUPPORT']) == 1))
 {
 	define('PAGE_URL', "page-{page}.html");
 }
@@ -139,7 +141,7 @@ else{ $portaltemplate = "pro_portal"; }
 if($proportal->settings['portalcolumns'] == "left" || $proportal->settings['portalcolumns'] == "both")
 {
 	// Getting left blocks
-	if ($fetch_blocks = $proportal->get_list("SELECT * FROM ".TABLE_PREFIX."portal_blocks WHERE zone='0' AND enabled='1' AND visible REGEXP '[[:<:]]".$mybb->user['usergroup']."[[:>:]]' ORDER BY position")) {
+	if ($fetch_blocks = $proportal->get_list("SELECT * FROM ".TABLE_PREFIX."portal_blocks WHERE zone='0' AND enabled='1' AND visible REGEXP '\\\b".$mybb->user['usergroup']."\\\b' ORDER BY position")) {
 		foreach ($fetch_blocks as $result_blocks) {
 			$title = $result_blocks['title'];
 			$file = $result_blocks['file'];
@@ -150,13 +152,13 @@ if($proportal->settings['portalcolumns'] == "left" || $proportal->settings['port
 			$collapsed_name = "block_{$result_blocks['id']}_c";
 			if(isset($collapsed[$collapsed_name]) && $collapsed[$collapsed_name] == "display: show;")
 			{
-				$expcolimage = "collapse_collapsed.gif";
+				$expcolimage = "collapse_collapsed.png";
 				$expdisplay = "display: none;";
 				$expaltext = "[+]";
 			}
 			else
 			{
-				$expcolimage = "collapse.gif";
+				$expcolimage = "collapse.png";
 				$expaltext = "[-]";
 			}
 			
@@ -189,7 +191,7 @@ if($proportal->settings['portalcolumns'] == "left" || $proportal->settings['port
 if($proportal->settings['portalcolumns'] == "right" || $proportal->settings['portalcolumns'] == "both")
 {
 	// Getting right blocks
-	if ($fetch_blocks = $proportal->get_list("SELECT * FROM ".TABLE_PREFIX."portal_blocks WHERE zone='2' AND enabled='1' AND visible REGEXP '[[:<:]]".$mybb->user['usergroup']."[[:>:]]' ORDER BY position")) {
+	if ($fetch_blocks = $proportal->get_list("SELECT * FROM ".TABLE_PREFIX."portal_blocks WHERE zone='2' AND enabled='1' AND visible REGEXP '\\\b".$mybb->user['usergroup']."\\\b' ORDER BY position")) {
 		foreach ($fetch_blocks as $result_blocks) {
 			$title = $result_blocks['title'];
 			$file = $result_blocks['file'];
@@ -200,13 +202,13 @@ if($proportal->settings['portalcolumns'] == "right" || $proportal->settings['por
 			$collapsed_name = "block_{$result_blocks['id']}_c";
 			if(isset($collapsed[$collapsed_name]) && $collapsed[$collapsed_name] == "display: show;")
 			{
-				$expcolimage = "collapse_collapsed.gif";
+				$expcolimage = "collapse_collapsed.png";
 				$expdisplay = "display: none;";
 				$expaltext = "[+]";
 			}
 			else
 			{
-				$expcolimage = "collapse.gif";
+				$expcolimage = "collapse.png";
 				$expaltext = "[-]";
 			}
 			
@@ -237,7 +239,8 @@ if($proportal->settings['portalcolumns'] == "right" || $proportal->settings['por
 }
 
 // Getting center module
-if($mybb->input['pages'])
+$pages = $mybb->input['pages'] ?? '';
+if ($pages !== '')
 {
 	$pages = $db->escape_string($mybb->input['pages']);
 	$query = $db->simple_select("portal_pages", "*", "name='{$pages}'");
@@ -266,7 +269,7 @@ if($mybb->input['pages'])
 else
 {	
 	// Getting center blocks
-	if ($fetch_blocks = $proportal->get_list("SELECT * FROM ".TABLE_PREFIX."portal_blocks WHERE zone='1' AND enabled='1' AND visible REGEXP '[[:<:]]".$mybb->user['usergroup']."[[:>:]]' ORDER BY position")) {
+	if ($fetch_blocks = $proportal->get_list("SELECT * FROM ".TABLE_PREFIX."portal_blocks WHERE zone='1' AND enabled='1' AND visible REGEXP '\\\b".$mybb->user['usergroup']."\\\b' ORDER BY position")) {
 		foreach ($fetch_blocks as $result_blocks) {
 			$title = $result_blocks['title'];
 			$file = $result_blocks['file'];
@@ -277,13 +280,13 @@ else
 			$collapsed_name = "block_{$result_blocks['id']}_c";
 			if(isset($collapsed[$collapsed_name]) && $collapsed[$collapsed_name] == "display: show;")
 			{
-				$expcolimage = "collapse_collapsed.gif";
+				$expcolimage = "collapse_collapsed.png";
 				$expdisplay = "display: none;";
 				$expaltext = "[+]";
 			}
 			else
 			{
-				$expcolimage = "collapse.gif";
+				$expcolimage = "collapse.png";
 				$expaltext = "[-]";
 			}
 			

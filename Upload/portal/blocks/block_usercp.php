@@ -8,15 +8,26 @@
  ***************************************************************/
  
 if (!defined("IN_PORTAL")) {
-	die("<div style=\"border:1px solid #CC0000; padding:3px; margin:0; font-family:Tahoma; width:250px; font-size:12px;\"><strong>Error:</strong> This file cannot be viewed directly!</div>");
+	die("<div style=\"border:1px solid #CC0000; padding:3px; margin:0; font-family:Tahoma; width:250px; font-size:12px;\"><strong>Uyarý:</strong> Bu dosyayý görüntüleme izniniz yok.</div>");
 }
+$ucp_avatar_width_height = "";
 
 // get forums user cannot view
 $unviewable = get_unviewable_forums();
-if($unviewable)
+if(!empty($unviewable))
 {
-	$unviewwhere = " AND fid NOT IN ($unviewable)";
+    // Si $unviewable es un array de IDs
+    if(is_array($unviewable)) {
+        $unviewable = array_map('intval', $unviewable); // asegurar que sean enteros
+        $unviewwhere = " AND fid NOT IN (" . implode(',', $unviewable) . ")";
+    } else {
+        // Si ya viene como cadena de IDs
+        $unviewwhere = " AND fid NOT IN ($unviewable)";
+    }
+} else {
+    $unviewwhere = ''; // No hay foros que excluir
 }
+
 // If user is known, welcome them
 if($mybb->user['uid'] != 0)
 {

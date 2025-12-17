@@ -58,7 +58,6 @@ if(file_exists("lock"))
 	$portal_installed = true;
 }
 
-require_once MYBB_ROOT.'inc/class_xml.php';
 require_once MYBB_ROOT.'inc/functions_user.php';
 require_once MYBB_ROOT.'inc/class_language.php';
 $lang = new MyLanguage();
@@ -639,9 +638,7 @@ function import_template($xml, $options=array())
 {
 	global $mybb, $db;
 	
-	require_once MYBB_ROOT."inc/class_xml.php";
-
-	$parser = new XMLParser($xml);
+    $parser = create_xml_parser($xml);
 	$tree = $parser->get_tree();
 
 	if(!is_array($tree) || !is_array($tree['theme']))

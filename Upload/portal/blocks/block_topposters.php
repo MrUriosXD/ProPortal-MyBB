@@ -6,7 +6,8 @@
  * Website: http://www.promybb.com/
  * License: http://creativecommons.org/licenses/by-nc-sa/3.0/
  ***************************************************************/
- 
+
+$topposters = "";
 $tpaltbg = alt_trow();
 $query = $db->query("SELECT uid, username, postnum, avatar, avatardimensions, usergroup, displaygroup FROM ".TABLE_PREFIX."users ORDER by postnum DESC LIMIT 0, 10");
 while($user = $db->fetch_array($query))
