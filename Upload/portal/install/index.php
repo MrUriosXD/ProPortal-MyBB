@@ -425,6 +425,7 @@ function populate_tables()
 	
 	require_once MYBB_ROOT.'inc/class_datacache.php';
 	$cache = new datacache;
+	$cache->update_usergroups(); 
 	$usergroups = $cache->read("usergroups");
 	$groups = array();
 	foreach($usergroups as $group)
