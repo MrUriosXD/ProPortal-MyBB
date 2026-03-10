@@ -368,6 +368,12 @@ if($mybb->input['action'] == "delete")
 {
 	$plugins->run_hooks("admin_blog_pages_delete");
 
+	if(!verify_post_check($mybb->input['my_post_key']))
+	{
+		flash_message($lang->invalid_post_verify_key2, 'error');
+		admin_redirect("index.php?module=problog/pages");
+	}
+
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');

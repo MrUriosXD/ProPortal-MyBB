@@ -23,15 +23,17 @@
 </table>
 <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
 <tr>
-<td align="center" width="100%" class="smalltext"><a href="http://www.promybb.com/" target="_blank">Pro Blog 1.0</a> &copy; 2010 <a href="http://atopal.com/" target="_blank">Adnan TOPAL</a></td>
+<td align="center" width="100%" class="smalltext"><a href="blog.php?action=rss" target="_blank">RSS Syndication</a> | Powered by ProBlog 1.0 &copy; 2010</td>
 </tr>
 </table>
 {$footer}
 </body>
 </html>]]></template>
-			<template name="pro_blog_announcement" version="1400"><![CDATA[<table cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+			<template name="pro_blog_announcement" version="1400"><![CDATA[<table cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder" style="{$closed_style}">
 <tr>
-<td class="thead"><strong>{$icon} <a href="{$announcement['threadlink']}">{$announcement['subject']}</a></strong></td>
+<td class="thead">
+<div style="float: right;" class="smalltext">{$mod_options}</div>
+<strong>{$icon} <a href="{$announcement['threadlink']}">{$announcement['subject']}</a></strong></td>
 </tr>
 <tr>
 <td class="trow2" align="right" valign="middle">
@@ -43,7 +45,7 @@
 <td class="trow1">
 <table border="0" cellpadding="{$theme['tablespace']}" width="100%">
 	<tr>
-		<td class="trow1" style="border: 0px;">
+		<td class="trow1" style="border: 0px; background: transparent;">
 			<div style="margin: -2px 0;">
 				{$message}
 			</div>
@@ -54,6 +56,9 @@
 </tr>
 <tr>
 <td class="trow2" align="right" valign="middle">
+<span class="smalltext" style="float: left;">
+{$report_btn}
+</span>
 <span class="smalltext">
 {$like_btn}
 </span>
@@ -94,7 +99,7 @@
 </table>
 <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
 <tr>
-<td align="center" width="100%" class="smalltext"><a href="http://promybb.com/" target="_blank">Pro Blog 1.0</a> &copy; 2010 <a href="http://atopal.com/" target="_blank">DragonFever</a></td>
+<td align="center" width="100%" class="smalltext"><a href="blog.php?action=rss" target="_blank">RSS Syndication</a> | Powered by ProBlog 1.0 &copy; 2010</td>
 </tr>
 </table>
 {$footer}
@@ -133,13 +138,14 @@
 </table>
 <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
 <tr>
-<td align="center" width="100%" class="smalltext"><a href="http://promybb.com/" target="_blank">Pro Blog 1.0</a> &copy; 2010 <a href="http://atopal.com/" target="_blank">DragonFever</a></td>
+<td align="center" width="100%" class="smalltext"><a href="blog.php?action=rss" target="_blank">RSS Syndication</a> | Powered by ProBlog 1.0 &copy; 2010</td>
 </tr>
 </table>
 {$footer}
 </body>
 </html>]]></template>
 			<template name="pro_blog_comment_bit" version="1400"><![CDATA[<div class="tborder" style="margin-bottom: 10px; padding: 10px;">
+<div style="float: right;" class="smalltext">{$comment_mod_options}</div>
 <strong>{$comment['username']}</strong> - <span class="smalltext">{$comment['date']}</span>
 <div style="margin-top: 5px;">{$comment['content']}</div>
 </div>]]></template>
@@ -149,7 +155,7 @@
 <input type="hidden" name="pid" value="{$id}" />
 <table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
 <tr><td class="thead"><strong>Post a Comment</strong></td></tr>
-<tr><td class="trow1"><textarea name="message" rows="5" style="width: 95%"></textarea></td></tr>
+<tr><td class="trow1"><textarea name="message" rows="5" style="width: 100%; box-sizing: border-box;"></textarea></td></tr>
 <tr><td class="trow2" align="center"><input type="submit" class="button" value="Submit Comment" /></td></tr>
 </table>
 </form>
@@ -162,7 +168,7 @@
 <table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
 <tr><td class="thead"><strong>Report Item</strong></td></tr>
 <tr><td class="trow1">Please enter the reason for reporting this item:</td></tr>
-<tr><td class="trow1"><textarea name="reason" rows="5" style="width: 95%"></textarea></td></tr>
+<tr><td class="trow1"><textarea name="reason" rows="5" style="width: 100%; box-sizing: border-box;"></textarea></td></tr>
 <tr><td class="trow2" align="center"><input type="submit" class="button" value="Send Report" /></td></tr>
 </table>
 </form>
@@ -171,5 +177,14 @@
 <tr><td class="thead"><strong>{$lang->search_results}</strong></td></tr>
 <tr><td class="trow1">{$search_results}</td></tr>
 </table>]]></template>
+            <template name="pro_blog_archive" version="1400"><![CDATA[<table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+<tr><td class="thead"><strong>Blog Archive</strong></td></tr>
+{$archive_bits}
+</table>
+<br />
+{$multipage}]]></template>
+            <template name="pro_blog_archive_bit" version="1400"><![CDATA[<tr>
+<td class="trow1"><a href="blog.php?action=view&id={$post['pid']}"><strong>{$post['title']}</strong></a> <span class="smalltext">({$post['date']})</span></td>
+</tr>]]></template>
 	</templates>
 </theme>

@@ -34,10 +34,18 @@ while($user = $db->fetch_array($query))
 	}
 }
 
+// Who was online today (simplified)
+$today = strtotime("today");
+$whowas_query = $db->simple_select("users", "COUNT(uid) AS count", "lastactive > {$today}");
+$whowas_count = $db->fetch_field($whowas_query, "count");
+
 echo "<span class=\"smalltext\">";
 echo "<strong>Online Users:</strong> ".($online_count + $guest_count)."<br />";
 echo "<strong>Members:</strong> {$online_count}<br />";
 echo "<strong>Guests:</strong> {$guest_count}<br /><br />";
-if(!empty($users)) echo implode(", ", $users);
+if(!empty($users)) echo implode(", ", $users)."<br /><br />";
+echo "<div style='border-top: 1px solid #ddd; padding-top: 5px; margin-top: 5px;'>";
+echo "<a href='#' onclick='alert(\"Feature not fully implemented.\"); return false;'>Who Was Online Today</a> ({$whowas_count})";
+echo "</div>";
 echo "</span>";
 ?>

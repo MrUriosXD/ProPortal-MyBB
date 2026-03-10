@@ -75,4 +75,20 @@ $l['no_thread'] = "No posts have been created yet.";
 $l['search'] = "Search";
 $l['search_results'] = "Search Results";
 $l['no_results'] = "No results found.";
+
+// MyBlog Specific
+$l['blog_likes'] = "Likes";
+$l['blog_like'] = "Like";
+$l['blog_report'] = "Report";
+$l['blog_comments'] = "Comments";
+$l['blog_post_comment'] = "Post a Comment";
+$l['blog_submit_comment'] = "Submit Comment";
+$l['blog_archive'] = "Blog Archive";
+$l['blog_online_today'] = "Who Was Online Today";
+$l['blog_stats_total_posts'] = "Total Posts:";
+$l['blog_stats_total_comments'] = "Total Comments:";
+$l['blog_stats_latest'] = "Latest:";
+$l['blog_stats_most_viewed'] = "Most Viewed:";
+$l['blog_stats_most_liked'] = "Most Liked:";
+$l['blog_stats_most_discussed'] = "Most Discussed:";
 ?>

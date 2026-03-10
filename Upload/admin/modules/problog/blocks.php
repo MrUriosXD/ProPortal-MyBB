@@ -458,6 +458,12 @@ if($mybb->input['action'] == "delete")
 {
 	$plugins->run_hooks("admin_blog_blocks_delete");
 
+	if(!verify_post_check($mybb->input['my_post_key']))
+	{
+		flash_message($lang->invalid_post_verify_key2, 'error');
+		admin_redirect("index.php?module=problog/blocks");
+	}
+
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');

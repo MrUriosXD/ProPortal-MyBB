@@ -101,6 +101,12 @@ if($mybb->input['action'] == "do_add")
 
 if($mybb->input['action'] == "delete")
 {
+	if(!verify_post_check($mybb->input['my_post_key']))
+	{
+		flash_message($lang->invalid_post_verify_key2, 'error');
+		admin_redirect("index.php?module=problog/posts");
+	}
+
 	$db->delete_query("blog_posts", "pid='".(int)$mybb->input['pid']."'");
 	flash_message($lang->blog_posts_success_deleted, 'success');
 	admin_redirect("index.php?module=problog/posts");

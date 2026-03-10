@@ -32,7 +32,7 @@ if(!@chdir($forumdir) && !empty($forumdir))
 	}
 }
 
-$templatelist = "pro_blog,pro_blog_left,pro_blog_page,pro_blog_right,pro_blog_block,pro_blog_announcement,calendar_mini,calendar_mini_weekrow,calendar_mini_weekrow_day,calendar_mini_weekdayheader, multipage, multipage_nextpage, multipage_page, multipage_page_current";
+$templatelist = "pro_blog,pro_blog_left,pro_blog_page,pro_blog_right,pro_blog_block,pro_blog_announcement,pro_blog_comment_bit,pro_blog_quick_reply,pro_blog_report,pro_blog_search,pro_blog_archive,pro_blog_archive_bit,calendar_mini,calendar_mini_weekrow,calendar_mini_weekrow_day,calendar_mini_weekdayheader, multipage, multipage_nextpage, multipage_page, multipage_page_current";
 
 require_once $change_dir."/global.php";
 require_once MYBB_ROOT."inc/functions_post.php";
@@ -72,9 +72,16 @@ while($setting = $db->fetch_array($query))
 
 $problog->settings = &$settings;
 
+// Permissions
+$mod_groups = explode(",", $problog->settings['moderator_groups']);
+$is_mod = in_array($mybb->user['usergroup'], $mod_groups) || $mybb->usergroup['cancp'] == 1;
+
 // Handle Like Action (AJAX)
 if($mybb->input['action'] == "like" && $mybb->user['uid'] > 0)
 {
+    $can_like = explode(",", $problog->settings['can_like_groups']);
+    if(!in_array($mybb->user['usergroup'], $can_like)) { echo "Permission Denied"; exit; }
+
 	$pid = (int)$mybb->input['pid'];
 	$query = $db->simple_select("blog_likes", "lid", "pid='{$pid}' AND uid='{$mybb->user['uid']}'");
 	if(!$db->fetch_field($query, "lid"))
@@ -87,8 +94,60 @@ if($mybb->input['action'] == "like" && $mybb->user['uid'] > 0)
 	exit;
 }
 
+// Moderator Actions
+if($is_mod)
+{
+    if($mybb->input['action'] == "mod_close")
+    {
+        verify_post_check($mybb->input['my_post_key']);
+        $pid = (int)$mybb->input['id'];
+        $db->update_query("blog_posts", array("closed" => 1), "pid='{$pid}'");
+        redirect("blog.php?action=view&id={$pid}", "Post closed.");
+    }
+    if($mybb->input['action'] == "mod_open")
+    {
+        verify_post_check($mybb->input['my_post_key']);
+        $pid = (int)$mybb->input['id'];
+        $db->update_query("blog_posts", array("closed" => 0), "pid='{$pid}'");
+        redirect("blog.php?action=view&id={$pid}", "Post opened.");
+    }
+    if($mybb->input['action'] == "mod_archive")
+    {
+        verify_post_check($mybb->input['my_post_key']);
+        $pid = (int)$mybb->input['id'];
+        $db->update_query("blog_posts", array("archived" => 1), "pid='{$pid}'");
+        redirect("blog.php?action=view&id={$pid}", "Post archived.");
+    }
+    if($mybb->input['action'] == "mod_unarchive")
+    {
+        verify_post_check($mybb->input['my_post_key']);
+        $pid = (int)$mybb->input['id'];
+        $db->update_query("blog_posts", array("archived" => 0), "pid='{$pid}'");
+        redirect("blog.php?action=view&id={$pid}", "Post restored from archive.");
+    }
+    if($mybb->input['action'] == "mod_delete_post")
+    {
+        verify_post_check($mybb->input['my_post_key']);
+        $pid = (int)$mybb->input['id'];
+        $db->delete_query("blog_posts", "pid='{$pid}'");
+        $db->delete_query("blog_comments", "post_id='{$pid}'");
+        $db->delete_query("blog_likes", "pid='{$pid}'");
+        redirect("blog.php", "Post deleted.");
+    }
+    if($mybb->input['action'] == "mod_delete_comment")
+    {
+        verify_post_check($mybb->input['my_post_key']);
+        $cid = (int)$mybb->input['id'];
+        $query = $db->simple_select("blog_comments", "post_id", "cid='{$cid}'");
+        $pid = $db->fetch_field($query, "post_id");
+        $db->delete_query("blog_comments", "cid='{$cid}'");
+        if($pid) $db->write_query("UPDATE ".TABLE_PREFIX."blog_posts SET comments_count = comments_count - 1 WHERE pid = '{$pid}'");
+        redirect("blog.php?action=view&id={$pid}", "Comment deleted.");
+    }
+}
+
 // Handle RSS
-if($mybb->input['action'] == "rss")
+if($mybb->input['action'] == "rss" && $problog->settings['enable_rss'])
 {
 	header("Content-Type: application/xml; charset=utf-8");
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -111,57 +170,6 @@ if($mybb->input['action'] == "rss")
 	exit;
 }
 
-// This allows users to login if the blog is stored offsite or in a different directory
-if(isset($mybb->input['action']) && $mybb->input['action'] == "do_login" && $mybb->request_method == "post")
-{
-	$plugins->run_hooks("blog_do_login_start");
-
-	// Checks to make sure the user can login; they haven't had too many tries at logging in.
-	// Is a fatal call if user has had too many tries
-	$logins = login_attempt_check();
-	$login_text = '';
-
-	if(!username_exists($mybb->input['username']))
-	{
-		error($lang->error_invalidpworusername.$login_text);
-	}
-	$user = validate_password_from_username($mybb->input['username'], $mybb->input['password']);
-	if(!$user['uid'])
-	{
-		my_setcookie('loginattempts', $logins + 1);
-		$db->write_query("UPDATE ".TABLE_PREFIX."users SET loginattempts=loginattempts+1 WHERE username = '".$db->escape_string($mybb->input['username'])."'");
-		if($mybb->settings['failedlogintext'] == 1)
-		{
-			$login_text = $lang->sprintf($lang->failed_login_again, $mybb->settings['failedlogincount'] - $logins);
-		}
-		error($lang->error_invalidpassword.$login_text);
-	}
-
-	my_setcookie('loginattempts', 1);
-	$db->delete_query("sessions", "ip='".$db->escape_string($session->ipaddress)."' AND sid != '".$session->sid."'");
-	$newsession = array(
-		"uid" => $user['uid'],
-	);
-	$db->update_query("sessions", $newsession, "sid='".$session->sid."'");
-
-	$db->update_query("users", array("loginattempts" => 1), "uid='{$mybb->user['uid']}'");
-
-	// Temporarily set the cookie remember option for the login cookies
-	$mybb->user['remember'] = $user['remember'];
-
-	my_setcookie("mybbuser", $user['uid']."_".$user['loginkey'], null, true);
-	my_setcookie("sid", $session->sid, -1, true);
-
-	if(function_exists("loggedIn"))
-	{
-		loggedIn($user['uid']);
-	}
-
-	$plugins->run_hooks("blog_do_login_end");
-
-	redirect("blog.php", $lang->redirect_loggedin);
-}
-
 // Define blog-related seo urls
 if($mybb->settings['seourls'] == "yes" || ($mybb->settings['seourls'] == "auto" && !empty($_SERVER['SEO_SUPPORT']) == 1))
 {
@@ -177,16 +185,17 @@ if($problog->settings['blogcolumns'] == "left"){ $blogtemplate = "pro_blog_left"
 elseif($problog->settings['blogcolumns'] == "right"){ $blogtemplate = "pro_blog_right"; }
 else{ $blogtemplate = "pro_blog"; }
 
-if($problog->settings['blogcolumns'] == "left" || $problog->settings['blogcolumns'] == "both")
+// Logic to load blocks
+function load_blocks($zone)
 {
-	// Getting left blocks
-	if ($fetch_blocks = $problog->get_list("SELECT * FROM ".TABLE_PREFIX."blog_blocks WHERE zone='0' AND enabled='1' AND visible REGEXP '\\\b".$mybb->user['usergroup']."\\\b' ORDER BY position")) {
+    global $db, $mybb, $problog, $templates, $lang, $collapsed, $theme;
+    $blocks = "";
+    if ($fetch_blocks = $problog->get_list("SELECT * FROM ".TABLE_PREFIX."blog_blocks WHERE zone='{$zone}' AND enabled='1' AND visible REGEXP '\\\b".$mybb->user['usergroup']."\\\b' ORDER BY position")) {
 		foreach ($fetch_blocks as $result_blocks) {
 			$title = $result_blocks['title'];
 			$file = $result_blocks['file'];
 			$content = $result_blocks['content'];
 
-			// Collapse block thing
 			$expdisplay = '';
 			$collapsed_name = "block_{$result_blocks['id']}_c";
 			if(isset($collapsed[$collapsed_name]) && $collapsed[$collapsed_name] == "display: show;")
@@ -210,78 +219,28 @@ if($problog->settings['blogcolumns'] == "left" || $problog->settings['blogcolumn
 				} else {
 					$content = $lang->block_file_missing;
 				}
-			} else {
-				$content = $result_blocks['content'];
 			}
 
 			if($result_blocks['custom'] == "0"){
-				eval("\$leftblocks .= \"".$templates->get("pro_blog_block")."\";");
+				eval("\$blocks .= \"".$templates->get("pro_blog_block")."\";");
 			} else {
-				$leftblocks .= "<div style=\"padding-bottom:".$problog->settings['horizontalspace']."px;\">".$content."</div>";
+				$blocks .= "<div style=\"padding-bottom:".$problog->settings['horizontalspace']."px;\">".$content."</div>";
 			}
 		}
-	} else {
-		$title = $lang->left_block_none;
-		$content = $lang->left_block_none_content;
-		eval("\$leftblocks = \"".$templates->get("pro_blog_block")."\";");
 	}
+    return $blocks;
 }
+
+if($problog->settings['blogcolumns'] == "left" || $problog->settings['blogcolumns'] == "both")
+    $leftblocks = load_blocks(0);
 
 if($problog->settings['blogcolumns'] == "right" || $problog->settings['blogcolumns'] == "both")
-{
-	// Getting right blocks
-	if ($fetch_blocks = $problog->get_list("SELECT * FROM ".TABLE_PREFIX."blog_blocks WHERE zone='2' AND enabled='1' AND visible REGEXP '\\\b".$mybb->user['usergroup']."\\\b' ORDER BY position")) {
-		foreach ($fetch_blocks as $result_blocks) {
-			$title = $result_blocks['title'];
-			$file = $result_blocks['file'];
-			$content = $result_blocks['content'];
+    $rightblocks = load_blocks(2);
 
-			// Collapse block thing
-			$expdisplay = '';
-			$collapsed_name = "block_{$result_blocks['id']}_c";
-			if(isset($collapsed[$collapsed_name]) && $collapsed[$collapsed_name] == "display: show;")
-			{
-				$expcolimage = "collapse_collapsed.png";
-				$expdisplay = "display: none;";
-				$expaltext = "[+]";
-			}
-			else
-			{
-				$expcolimage = "collapse.png";
-				$expaltext = "[-]";
-			}
+// Center content logic
+$action = $mybb->input['action'] ?? '';
 
-			if($file != "0"){
-				if (file_exists(MYBB_ROOT."blog/blocks/block_$file.php")) {
-					ob_start();
-					include_once(MYBB_ROOT."blog/blocks/block_$file.php");
-					$content .= ob_get_contents();
-					ob_end_clean();
-				} else {
-					$content = $lang->block_file_missing;
-				}
-			} else {
-				$content = $result_blocks['content'];
-			}
-
-			if($result_blocks['custom'] == "0"){
-				eval("\$rightblocks .= \"".$templates->get("pro_blog_block")."\";");
-			} else {
-				$rightblocks .= "<div style=\"padding-bottom:".$problog->settings['horizontalspace']."px;\">".$content."</div>";
-			}
-		}
-	} else {
-		$title = $lang->right_block_none;
-		$content = $lang->right_block_none_content;
-		eval("\$rightblocks = \"".$templates->get("pro_blog_block")."\";");
-	}
-}
-
-// Getting center module
-$pages = $mybb->input['pages'] ?? '';
-
-// Search handling
-if($mybb->input['action'] == "search")
+if($action == "search")
 {
     $keywords = $db->escape_string($mybb->input['keywords']);
     $tag = $db->escape_string($mybb->input['tag']);
@@ -293,7 +252,7 @@ if($mybb->input['action'] == "search")
     if($cid) $where .= " AND cid='{$cid}'";
 
     $query = $db->simple_select("blog_posts", "*", $where, array("order_by" => "dateline", "order_dir" => "DESC"));
-    $centerblocks = "<h2>Search Results</h2>";
+    $search_results = "";
     while($post = $db->fetch_array($query))
     {
         $post['title'] = htmlspecialchars_uni($post['title']);
@@ -301,16 +260,15 @@ if($mybb->input['action'] == "search")
         {
             $post['title'] = str_replace($keywords, "<mark style='background:{$problog->settings['search_highlight_color']}'>{$keywords}</mark>", $post['title']);
         }
-        $centerblocks .= "<div><h3><a href='blog.php?action=view&id={$post['pid']}'>{$post['title']}</a></h3></div>";
+        $search_results .= "<div><h3><a href='blog.php?action=view&id={$post['pid']}'>{$post['title']}</a></h3></div>";
     }
-    eval("\$blog = \"".$templates->get($blogtemplate)."\";");
-    output_page($blog);
-    exit;
-}
+    if(!$search_results) $search_results = $lang->no_results;
 
-if($mybb->input['action'] == "view" && (int)$mybb->input['id'] > 0)
+    eval("\$centerblocks = \"".$templates->get("pro_blog_search")."\";");
+}
+elseif($action == "view")
 {
-	$id = (int)$mybb->input['id'];
+    $id = (int)$mybb->input['id'];
 	$query = $db->query("
 		SELECT p.*, u.username, u.avatar, u.avatardimensions
 		FROM ".TABLE_PREFIX."blog_posts p
@@ -320,48 +278,26 @@ if($mybb->input['action'] == "view" && (int)$mybb->input['id'] > 0)
 	$announcement = $db->fetch_array($query);
 	if($announcement)
 	{
-		// Update views
 		$db->update_query("blog_posts", array("views" => $announcement['views'] + 1), "pid='{$id}'");
 
 		$announcement['threadlink'] = "blog.php?action=view&id=".$announcement['pid'];
-		if($announcement['uid'] == 0)
-		{
-			$profilelink = $lang->guest;
-		}
-		else
-		{
-			$profilelink = build_profile_link($announcement['username'], $announcement['uid']);
-		}
+		$profilelink = ($announcement['uid'] == 0) ? $lang->guest : build_profile_link($announcement['username'], $announcement['uid']);
 		$announcement['subject'] = htmlspecialchars_uni($parser->parse_badwords($announcement['title']));
 
-		// Avatar logic
+        // Avatar
 		if($announcement['avatar'] != '')
 		{
 			$avatar_dimensions = explode("|", $announcement['avatardimensions']);
-			if($avatar_dimensions[0] && $avatar_dimensions[1])
-			{
-				list($max_width, $max_height) = explode("x", my_strtolower("35x35"));
-				if($avatar_dimensions[0] > $max_width || $avatar_dimensions[1] > $max_height)
-				{
-					require_once MYBB_ROOT."inc/functions_image.php";
-					$scaled_dimensions = scale_image($avatar_dimensions[0], $avatar_dimensions[1], $max_width, $max_height);
-					$ann_avatar_width_height = "width=\"{$scaled_dimensions['width']}\" height=\"{$scaled_dimensions['height']}\"";
-				}
-				else
-				{
-					$ann_avatar_width_height = "width=\"{$avatar_dimensions[0]}\" height=\"{$avatar_dimensions[1]}\"";
-				}
-			}
+            list($max_width, $max_height) = explode("x", my_strtolower($problog->settings['avatar_size'] ?? "35x35"));
+            require_once MYBB_ROOT."inc/functions_image.php";
+            $scaled_dimensions = scale_image($avatar_dimensions[0] ?? 0, $avatar_dimensions[1] ?? 0, $max_width, $max_height);
+            $ann_avatar_width_height = "width=\"{$scaled_dimensions['width']}\" height=\"{$scaled_dimensions['height']}\"";
 			if (!stristr($announcement['avatar'], 'http://') && !stristr($announcement['avatar'], 'https://'))
-			{
 				$announcement['avatar'] = $mybb->settings['bburl'] . '/' . $announcement['avatar'];
-			}
 			$avatar = "<img src=\"".htmlspecialchars_uni($announcement['avatar'])."\" alt=\"\" {$ann_avatar_width_height} />";
 		}
-		else
-		{
-			$avatar = '';
-		}
+		else $avatar = '';
+
 		$anndate = my_date($mybb->settings['dateformat'], $announcement['dateline']);
 		$anntime = my_date($mybb->settings['timeformat'], $announcement['dateline']);
 		$numcomments = "- {$announcement['comments_count']} {$lang->replies}";
@@ -372,17 +308,34 @@ if($mybb->input['action'] == "view" && (int)$mybb->input['id'] > 0)
 		$message = $parser->parse_message($announcement['content'], $parser_options);
 		$icon = "&nbsp;";
 
-        // Like button logic
-        if($mybb->user['uid'] > 0)
+        // Moderator Options
+        $mod_options = "";
+        if($is_mod)
         {
-            $like_btn = "<button onclick=\"$.post('blog.php', {action: 'like', pid: '{$id}'}, function(d){ $('#likes_count').text(d); });\">Like</button>";
+            $mod_options .= "<a href='blog.php?action=mod_delete_post&id={$id}&my_post_key={$mybb->post_code}' onclick='return confirm(\"Are you sure?\")'>Delete</a> | ";
+            if($announcement['closed']) $mod_options .= "<a href='blog.php?action=mod_open&id={$id}&my_post_key={$mybb->post_code}'>Open</a> | ";
+            else $mod_options .= "<a href='blog.php?action=mod_close&id={$id}&my_post_key={$mybb->post_code}'>Close</a> | ";
+            if($announcement['archived']) $mod_options .= "<a href='blog.php?action=mod_unarchive&id={$id}&my_post_key={$mybb->post_code}'>Unarchive</a>";
+            else $mod_options .= "<a href='blog.php?action=mod_archive&id={$id}&my_post_key={$mybb->post_code}'>Archive</a>";
         }
+
+        // Like button logic
+        $like_btn = "";
+        $can_like = explode(",", $problog->settings['can_like_groups']);
+        if(in_array($mybb->user['usergroup'], $can_like))
+            $like_btn = "<button onclick=\"$.post('blog.php', {action: 'like', pid: '{$id}'}, function(d){ $('#likes_count').text(d); });\">Like</button>";
+
+        // Report button
+        $report_btn = "";
+        $can_report = explode(",", $problog->settings['can_report_groups']);
+        if(in_array($mybb->user['usergroup'], $can_report))
+			$report_btn = "<a href='blog.php?action=report&type=post&id={$id}'>Report</a>";
+
+        // Closed style
+        $closed_style = ($announcement['closed'] && $problog->settings['highlight_closed']) ? "background: {$problog->settings['closed_bgcolor']};" : "";
 
 		add_breadcrumb($announcement['subject']);
 		eval("\$centerblocks = \"".$templates->get("pro_blog_announcement")."\";");
-
-        // Post stats
-        $centerblocks .= "<div class='tborder' style='margin-top:10px; padding:10px;'>Stats: <span id='likes_count'>{$announcement['likes']}</span> Likes, {$announcement['views']} Views, {$announcement['comments_count']} Comments</div>";
 
 		// Fetch comments
 		$comment_list = '';
@@ -395,183 +348,139 @@ if($mybb->input['action'] == "view" && (int)$mybb->input['id'] > 0)
 		");
 		while($comment = $db->fetch_array($query))
 		{
-			$comment['date'] = my_date('relative', $comment['dateline']);
+			$comment['date'] = my_date($mybb->settings['dateformat'], $comment['dateline'])." ".my_date($mybb->settings['timeformat'], $comment['dateline']);
 			$comment['content'] = $parser->parse_message($comment['content'], $parser_options);
+
+            $comment_mod_options = "";
+            if($is_mod) $comment_mod_options = "<a href='blog.php?action=mod_delete_comment&id={$comment['cid']}&my_post_key={$mybb->post_code}' onclick='return confirm(\"Are you sure?\")'>Delete</a>";
+
 			eval("\$comment_list .= \"".$templates->get("pro_blog_comment_bit")."\";");
 		}
 
 		if(!$comment_list) $comment_list = "No comments yet.";
+		$centerblocks .= "<div id='comments' style='margin-top:20px;'><h2>Comments</h2>{$comment_list}</div>";
 
 		// Quick reply
-		$quick_reply = '';
-		if($mybb->user['uid'] > 0 && $announcement['closed'] == 0)
-		{
-			eval("\$quick_reply = \"".$templates->get("pro_blog_quick_reply")."\";");
-		}
-
-		add_breadcrumb($announcement['subject']);
-		eval("\$centerblocks = \"".$templates->get("pro_blog_announcement")."\";");
-
-		// Append comments to center blocks
-		$centerblocks .= "<div id='comments' style='margin-top:20px;'><h2>Comments</h2>{$comment_list}</div>";
-		$centerblocks .= $quick_reply;
-
-		// Post stats
-		$centerblocks .= "<div class='tborder' style='margin-top:10px; padding:10px;'>Stats: <span id='likes_count'>{$announcement['likes']}</span> Likes, {$announcement['views']} Views, {$announcement['comments_count']} Comments</div>";
-
-		// Report button logic
-		$report_btn = '';
-		if($mybb->user['uid'] > 0)
-		{
-			$report_btn = "<a href='blog.php?action=report&type=post&id={$id}'>Report</a>";
-		}
+        $can_comment = explode(",", $problog->settings['can_comment_groups']);
+		if(in_array($mybb->user['usergroup'], $can_comment) && $announcement['closed'] == 0)
+			eval("\$centerblocks .= \"".$templates->get("pro_blog_quick_reply")."\";");
 
 		eval("\$blog = \"".$templates->get($blogtemplate)."\";");
 		$blog = $problog->page_title($blog, $announcement['subject']);
 		output_page($blog);
-	}
-	else
-	{
-		redirect("blog.php");
+        exit;
 	}
 }
-
-// Handle Reports
-if($mybb->input['action'] == "report")
+elseif($action == "archive")
 {
-	$id = (int)$mybb->input['id'];
+    $page = (int)$mybb->input['page'];
+    if($page < 1) $page = 1;
+    $per_page = (int)$problog->settings['archive_limit'];
+    $start = ($page - 1) * $per_page;
+
+    $query = $db->simple_select("blog_posts", "COUNT(*) AS count", "enabled='1'");
+    $count = $db->fetch_field($query, "count");
+
+    $multipage = multipage($count, $per_page, $page, "blog.php?action=archive");
+
+    $archive_bits = "";
+    $query = $db->simple_select("blog_posts", "*", "enabled='1'", array("order_by" => "dateline", "order_dir" => "DESC", "limit_start" => $start, "limit" => $per_page));
+    while($post = $db->fetch_array($query))
+    {
+        $post['date'] = my_date($mybb->settings['dateformat'], $post['dateline']);
+        eval("\$archive_bits .= \"".$templates->get("pro_blog_archive_bit")."\";");
+    }
+
+    add_breadcrumb("Archive");
+    eval("\$centerblocks = \"".$templates->get("pro_blog_archive")."\";");
+}
+elseif($action == "report")
+{
+    $id = (int)$mybb->input['id'];
 	$type = $db->escape_string($mybb->input['type']);
-
 	if($mybb->user['uid'] == 0) error_no_permission();
-
-	eval("\$report_form = \"".$templates->get("pro_blog_report")."\";");
-	$centerblocks = $report_form;
-	eval("\$blog = \"".$templates->get($blogtemplate)."\";");
-	output_page($blog);
-	exit;
+	eval("\$centerblocks = \"".$templates->get("pro_blog_report")."\";");
 }
-
-if($mybb->input['action'] == "do_report" && $mybb->request_method == "post")
+elseif($action == "do_report")
 {
-	verify_post_check($mybb->input['my_post_key']);
+    verify_post_check($mybb->input['my_post_key']);
 	$id = (int)$mybb->input['id'];
 	$type = $db->escape_string($mybb->input['type']);
 	$reason = $db->escape_string($mybb->input['reason']);
-
 	if($mybb->user['uid'] > 0 && !empty($reason))
 	{
-		$insert_array = array(
-			"id" => $id,
-			"type" => $type,
-			"uid" => $mybb->user['uid'],
-			"reason" => $reason,
-			"dateline" => TIME_NOW
-		);
-		$db->insert_query("blog_reports", $insert_array);
+		$db->insert_query("blog_reports", array("id" => $id, "type" => $type, "uid" => $mybb->user['uid'], "reason" => $reason, "dateline" => TIME_NOW));
 	}
 	redirect("blog.php", "Thank you for your report.");
 }
-
-// Handle comment submission
-if($mybb->input['action'] == "do_comment" && $mybb->request_method == "post")
+elseif($action == "do_comment")
 {
-	verify_post_check($mybb->input['my_post_key']);
+    verify_post_check($mybb->input['my_post_key']);
 	$pid = (int)$mybb->input['pid'];
 	$content = $db->escape_string($mybb->input['message']);
-
-	if($mybb->user['uid'] > 0 && !empty($content))
+    $can_comment = explode(",", $problog->settings['can_comment_groups']);
+	if(in_array($mybb->user['usergroup'], $can_comment) && !empty($content))
 	{
-		$insert_array = array(
-			"post_id" => $pid,
-			"uid" => $mybb->user['uid'],
-			"content" => $content,
-			"dateline" => TIME_NOW,
-			"ipaddress" => my_inet_pton(get_ip())
-		);
-		$db->insert_query("blog_comments", $insert_array);
+		$db->insert_query("blog_comments", array("post_id" => $pid, "uid" => $mybb->user['uid'], "content" => $content, "dateline" => TIME_NOW, "ipaddress" => my_inet_pton(get_ip())));
 		$db->write_query("UPDATE ".TABLE_PREFIX."blog_posts SET comments_count = comments_count + 1 WHERE pid = '{$pid}'");
 	}
 	redirect("blog.php?action=view&id={$pid}#comments");
 }
-elseif ($pages !== '')
-{
-	$pages = $db->escape_string($mybb->input['pages']);
-	$query = $db->simple_select("blog_pages", "*", "name='{$pages}'");
-	$page_data = $db->fetch_array($query);
-	if($page_data && $page_data['enabled'] == "1")
-	{
-		$visible = explode(",", $page_data['visible']);
-		if(!in_array($mybb->user['usergroup'], $visible))
-		{
-			error_no_permission();
-		}
-		$title = $page_data['title'];
-		$content = $page_data['content'];
-		add_breadcrumb($title, $problog->page_url($pages));
-		eval("\$centerblocks .= \"".$templates->get("pro_blog_page")."\";");
-
-		eval("\$blog = \"".$templates->get($blogtemplate)."\";");
-		$blog = $problog->page_title($blog, $title); // Change page title
-
-		$plugins->run_hooks("pro_blog_end");
-		output_page($blog);
-	} else {
-		redirect("blog.php");
-	}
-}
 else
 {
-	// Getting center blocks
-	if ($fetch_blocks = $problog->get_list("SELECT * FROM ".TABLE_PREFIX."blog_blocks WHERE zone='1' AND enabled='1' AND visible REGEXP '\\\b".$mybb->user['usergroup']."\\\b' ORDER BY position")) {
-		foreach ($fetch_blocks as $result_blocks) {
-			$title = $result_blocks['title'];
-			$file = $result_blocks['file'];
-			$content = $result_blocks['content'];
+    // Index - Latest Posts with pagination
+    $page = (int)$mybb->input['page'];
+    if($page < 1) $page = 1;
+    $per_page = (int)$problog->settings['posts_per_page'];
+    $start = ($page - 1) * $per_page;
 
-			// Collapse block thing
-			$expdisplay = '';
-			$collapsed_name = "block_{$result_blocks['id']}_c";
-			if(isset($collapsed[$collapsed_name]) && $collapsed[$collapsed_name] == "display: show;")
-			{
-				$expcolimage = "collapse_collapsed.png";
-				$expdisplay = "display: none;";
-				$expaltext = "[+]";
-			}
-			else
-			{
-				$expcolimage = "collapse.png";
-				$expaltext = "[-]";
-			}
+    $query = $db->simple_select("blog_posts", "COUNT(*) AS count", "enabled='1' AND archived='0'");
+    $count = $db->fetch_field($query, "count");
+    $multipage = multipage($count, $per_page, $page, "blog.php");
 
-			if($file != "0"){
-				if (file_exists(MYBB_ROOT."blog/blocks/block_$file.php")) {
-					ob_start();
-					include_once(MYBB_ROOT."blog/blocks/block_$file.php");
-					$content .= ob_get_contents();
-					ob_end_clean();
-				} else {
-					$content = $lang->block_file_missing;
-				}
-			} else {
-				$content = $result_blocks['content'];
-			}
+    $query = $db->query("
+        SELECT p.*, u.username, u.avatar, u.avatardimensions
+        FROM ".TABLE_PREFIX."blog_posts p
+        LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid = p.uid)
+        WHERE p.enabled='1' AND p.archived='0'
+        ORDER BY p.dateline DESC
+        LIMIT {$start}, {$per_page}
+    ");
 
-			if($result_blocks['custom'] == "0"){
-				eval("\$centerblocks .= \"".$templates->get("pro_blog_block")."\";");
-			} else {
-				$centerblocks .= "<div style=\"padding-bottom:".$problog->settings['horizontalspace']."px;\">".$content."</div>";
-			}
-		}
-	} else {
-		$title = $lang->center_block_none;
-		$content = $lang->center_block_none_content;
-		eval("\$centerblocks .= \"".$templates->get("pro_blog_block")."\";");
-	}
+    while($announcement = $db->fetch_array($query))
+    {
+        $announcement['threadlink'] = "blog.php?action=view&id=".$announcement['pid'];
+		$profilelink = ($announcement['uid'] == 0) ? $lang->guest : build_profile_link($announcement['username'], $announcement['uid']);
+		$announcement['subject'] = htmlspecialchars_uni($parser->parse_badwords($announcement['title']));
 
-	eval("\$blog = \"".$templates->get($blogtemplate)."\";");
+        // Avatar logic (truncated for brevity in index)
+        $avatar = "";
+        if($announcement['avatar'] != '')
+        {
+            if (!stristr($announcement['avatar'], 'http://') && !stristr($announcement['avatar'], 'https://'))
+				$announcement['avatar'] = $mybb->settings['bburl'] . '/' . $announcement['avatar'];
+            $avatar = "<img src=\"".htmlspecialchars_uni($announcement['avatar'])."\" alt=\"\" width=\"35\" height=\"35\" />";
+        }
 
-	$plugins->run_hooks("pro_blog_end");
+		$anndate = my_date($mybb->settings['dateformat'], $announcement['dateline']);
+		$anntime = my_date($mybb->settings['timeformat'], $announcement['dateline']);
+		$numcomments = "- {$announcement['comments_count']} {$lang->replies}";
+		$views = "<strong>{$announcement['views']}</strong> {$lang->latest_threads_views}";
+        $likes = "<strong>{$announcement['likes']}</strong> Likes";
 
-	output_page($blog);
+		$parser_options = array("allow_html" => 0, "allow_mycode" => 1, "allow_smilies" => 1, "allow_imgcode" => 1, "filter_badwords" => 1);
+        $content = $announcement['description'] ?: $announcement['content'];
+		$message = $parser->parse_message(my_substr($content, 0, $problog->settings['annmessagelength']), $parser_options);
+		$icon = "&nbsp;";
+
+        $mod_options = $report_btn = $like_btn = ""; // Simplified for index
+        $closed_style = ($announcement['closed'] && $problog->settings['highlight_closed']) ? "background: {$problog->settings['closed_bgcolor']};" : "";
+
+		eval("\$centerblocks .= \"".$templates->get("pro_blog_announcement")."\";");
+    }
+    $centerblocks .= $multipage;
 }
+
+eval("\$blog = \"".$templates->get($blogtemplate)."\";");
+output_page($blog);
 ?>
