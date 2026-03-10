@@ -1,0 +1,119 @@
+<?php
+/***************************************************************
+ * ProBlog
+ * Copyright \xa9 2010 ProMyBB, All Rights Reserved
+ *
+ * Website: http://www.promybb.com/
+ * License: http://creativecommons.org/licenses/by-nc-sa/3.0/
+ ***************************************************************/
+
+// Disallow direct access to this file for security reasons
+if(!defined("IN_MYBB"))
+{
+	die("Direct initialization of this file is not allowed.<br /><br />Please make sure IN_MYBB is defined.");
+}
+
+$page->add_breadcrumb_item($lang->blog_info, "index.php?module=problog/info");
+
+$plugins->run_hooks("admin_blog_info_begin");
+
+if(!$mybb->input['action'])
+{
+	$plugins->run_hooks("admin_blog_info_start");
+
+	$page->output_header($lang->blog_info);
+
+	$sub_tabs['blog_info'] = array(
+		'title' => $lang->blog_info,
+		'link' => "index.php?module=problog/info",
+		'description' => $lang->blog_info_description
+	);
+
+	$page->output_nav_tabs($sub_tabs, 'blog_info');
+
+	// Get the number of blocks
+	$query = $db->simple_select("blog_blocks", "COUNT(id) AS numblocks");
+	$blocksnum = my_number_format($db->fetch_field($query, "numblocks"));
+
+	// Get the number of enabled blocks
+	$query = $db->simple_select("blog_blocks", "COUNT(id) AS numblocks", "enabled='1'");
+	$activeblocksnum = my_number_format($db->fetch_field($query, "numblocks"));
+
+	// Get the number of disabled blocks
+	$passiveblocksnum = $blocksnum - $activeblocksnum;
+
+	// Get the number of left sided blocks
+	$query = $db->simple_select("blog_blocks", "COUNT(id) AS numblocks", "zone='0'");
+	$leftblocksnum = my_number_format($db->fetch_field($query, "numblocks"));
+
+	// Get the number of centered blocks
+	$query = $db->simple_select("blog_blocks", "COUNT(id) AS numblocks", "zone='1'");
+	$centerblocksnum = my_number_format($db->fetch_field($query, "numblocks"));
+
+	// Get the number of right sided blocks
+	$rightblocksnum = $blocksnum - ($leftblocksnum + $centerblocksnum);
+
+	$table = new Table;
+	/*$table->construct_header($lang->blog_information, array('width' => '100%', 'colspan' => '4'));*/
+
+	$table->construct_cell("<strong>{$lang->blog_version}</strong>", array('width' => '25%'));
+	$table->construct_cell("1.0", array('width' => '25%'));
+	$table->construct_cell("<strong>{$lang->blog_publishdate}</strong>", array('width' => '25%'));
+	$table->construct_cell("19.01.2010", array('width' => '25%'));
+	$table->construct_row();
+
+	$table->construct_cell("<strong>{$lang->blog_blocksnum}</strong>", array('width' => '25%'));
+	$table->construct_cell("{$blocksnum}", array('width' => '25%'));
+	$table->construct_cell("<strong>{$lang->blog_activeblocksnum}</strong>", array('width' => '25%'));
+	$table->construct_cell("{$activeblocksnum}", array('width' => '25%'));
+	$table->construct_row();
+
+	$table->construct_cell("<strong>{$lang->blog_passiveblocksnum}</strong>", array('width' => '25%'));
+	$table->construct_cell("{$passiveblocksnum}", array('width' => '25%'));
+	$table->construct_cell("<strong>{$lang->blog_leftsidenum}</strong>", array('width' => '25%'));
+	$table->construct_cell("{$leftblocksnum}", array('width' => '25%'));
+	$table->construct_row();
+
+	$table->construct_cell("<strong>{$lang->blog_centernum}</strong>", array('width' => '25%'));
+	$table->construct_cell("{$centerblocksnum}", array('width' => '25%'));
+	$table->construct_cell("<strong>{$lang->blog_rightsidenum}</strong>", array('width' => '25%'));
+	$table->construct_cell("{$rightblocksnum}", array('width' => '25%'));
+	$table->construct_row();
+
+	$table->output($lang->blog_information);
+
+	$table = new Table;
+
+	require_once MYBB_ROOT."inc/class_feedparser.php";
+	$feed_parser = new FeedParser();
+	$news = "";
+	$feed_parser->parse_feed("https://feeds.feedburner.com/problog");
+
+	if($feed_parser->error == '')
+	{
+		foreach($feed_parser->items as $item)
+		{
+			if($item['date_timestamp'])
+			{
+				$stamp = my_date($mybb->settings['dateformat'], $item['date_timestamp']).", ".my_date($mybb->settings['timeformat'], $item['date_timestamp']);
+			}
+			else
+			{
+				$stamp = '';
+			}
+
+			$description = "<span style=\"font-size: 12px;\">".htmlspecialchars_uni(strip_tags($item['description']))."</span>";
+
+			$news .= "<p><span style=\"font-size: 16px;\"><strong>".$item['title']."</strong></span><br />{$stamp}<br /><br />{$description}<strong><br /><br /><a href=\"{$item['link']}\" target=\"_blank\">&raquo; {$lang->blog_read_more}</a></strong></p><hr />";
+		}
+	}
+
+	$table->construct_cell("<div style='height: 200px; overflow: auto;'>{$news}</div>");
+	$table->construct_row();
+
+	$table->output($lang->blog_latest_news);
+
+	$page->output_footer();
+}
+
+?>
