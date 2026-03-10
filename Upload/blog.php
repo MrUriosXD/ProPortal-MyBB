@@ -72,6 +72,45 @@ while($setting = $db->fetch_array($query))
 
 $problog->settings = &$settings;
 
+// Handle Like Action (AJAX)
+if($mybb->input['action'] == "like" && $mybb->user['uid'] > 0)
+{
+	$pid = (int)$mybb->input['pid'];
+	$query = $db->simple_select("blog_likes", "lid", "pid='{$pid}' AND uid='{$mybb->user['uid']}'");
+	if(!$db->fetch_field($query, "lid"))
+	{
+		$db->insert_query("blog_likes", array("pid" => $pid, "uid" => $mybb->user['uid'], "dateline" => TIME_NOW));
+		$db->write_query("UPDATE ".TABLE_PREFIX."blog_posts SET likes = likes + 1 WHERE pid = '{$pid}'");
+	}
+	$query = $db->simple_select("blog_posts", "likes", "pid='{$pid}'");
+	echo $db->fetch_field($query, "likes");
+	exit;
+}
+
+// Handle RSS
+if($mybb->input['action'] == "rss")
+{
+	header("Content-Type: application/xml; charset=utf-8");
+	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	echo "<rss version=\"2.0\">\n<channel>\n";
+	echo "<title>".htmlspecialchars($mybb->settings['bbname'])." Blog</title>\n";
+	echo "<link>".$mybb->settings['bburl']."/blog.php</link>\n";
+	echo "<description>Latest blog posts</description>\n";
+
+	$query = $db->simple_select("blog_posts", "*", "enabled='1'", array("order_by" => "dateline", "order_dir" => "DESC", "limit" => (int)$problog->settings['rss_num_items']));
+	while($post = $db->fetch_array($query))
+	{
+		echo "<item>\n";
+		echo "<title>".htmlspecialchars($post['title'])."</title>\n";
+		echo "<link>".$mybb->settings['bburl']."/blog.php?action=view&amp;id=".$post['pid']."</link>\n";
+		echo "<description>".htmlspecialchars(my_substr(strip_tags($post['content']), 0, 500))."</description>\n";
+		echo "<pubDate>".date('r', $post['dateline'])."</pubDate>\n";
+		echo "</item>\n";
+	}
+	echo "</channel>\n</rss>";
+	exit;
+}
+
 // This allows users to login if the blog is stored offsite or in a different directory
 if(isset($mybb->input['action']) && $mybb->input['action'] == "do_login" && $mybb->request_method == "post")
 {
@@ -240,6 +279,35 @@ if($problog->settings['blogcolumns'] == "right" || $problog->settings['blogcolum
 
 // Getting center module
 $pages = $mybb->input['pages'] ?? '';
+
+// Search handling
+if($mybb->input['action'] == "search")
+{
+    $keywords = $db->escape_string($mybb->input['keywords']);
+    $tag = $db->escape_string($mybb->input['tag']);
+    $cid = (int)$mybb->input['cid'];
+
+    $where = "enabled='1'";
+    if($keywords) $where .= " AND (title LIKE '%{$keywords}%' OR content LIKE '%{$keywords}%')";
+    if($tag) $where .= " AND tags LIKE '%{$tag}%'";
+    if($cid) $where .= " AND cid='{$cid}'";
+
+    $query = $db->simple_select("blog_posts", "*", $where, array("order_by" => "dateline", "order_dir" => "DESC"));
+    $centerblocks = "<h2>Search Results</h2>";
+    while($post = $db->fetch_array($query))
+    {
+        $post['title'] = htmlspecialchars_uni($post['title']);
+        if($keywords && $problog->settings['highlight_keywords'])
+        {
+            $post['title'] = str_replace($keywords, "<mark style='background:{$problog->settings['search_highlight_color']}'>{$keywords}</mark>", $post['title']);
+        }
+        $centerblocks .= "<div><h3><a href='blog.php?action=view&id={$post['pid']}'>{$post['title']}</a></h3></div>";
+    }
+    eval("\$blog = \"".$templates->get($blogtemplate)."\";");
+    output_page($blog);
+    exit;
+}
+
 if($mybb->input['action'] == "view" && (int)$mybb->input['id'] > 0)
 {
 	$id = (int)$mybb->input['id'];
@@ -298,13 +366,65 @@ if($mybb->input['action'] == "view" && (int)$mybb->input['id'] > 0)
 		$anntime = my_date($mybb->settings['timeformat'], $announcement['dateline']);
 		$numcomments = "- {$announcement['comments_count']} {$lang->replies}";
 		$views = "<strong>{$announcement['views']}</strong> {$lang->latest_threads_views}";
+        $likes = "<strong>{$announcement['likes']}</strong> Likes";
 
 		$parser_options = array("allow_html" => 0, "allow_mycode" => 1, "allow_smilies" => 1, "allow_imgcode" => 1, "filter_badwords" => 1);
 		$message = $parser->parse_message($announcement['content'], $parser_options);
 		$icon = "&nbsp;";
 
+        // Like button logic
+        if($mybb->user['uid'] > 0)
+        {
+            $like_btn = "<button onclick=\"$.post('blog.php', {action: 'like', pid: '{$id}'}, function(d){ $('#likes_count').text(d); });\">Like</button>";
+        }
+
 		add_breadcrumb($announcement['subject']);
 		eval("\$centerblocks = \"".$templates->get("pro_blog_announcement")."\";");
+
+        // Post stats
+        $centerblocks .= "<div class='tborder' style='margin-top:10px; padding:10px;'>Stats: <span id='likes_count'>{$announcement['likes']}</span> Likes, {$announcement['views']} Views, {$announcement['comments_count']} Comments</div>";
+
+		// Fetch comments
+		$comment_list = '';
+		$query = $db->query("
+			SELECT c.*, u.username, u.avatar, u.avatardimensions
+			FROM ".TABLE_PREFIX."blog_comments c
+			LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid = c.uid)
+			WHERE c.post_id = '{$id}'
+			ORDER BY c.dateline ASC
+		");
+		while($comment = $db->fetch_array($query))
+		{
+			$comment['date'] = my_date('relative', $comment['dateline']);
+			$comment['content'] = $parser->parse_message($comment['content'], $parser_options);
+			eval("\$comment_list .= \"".$templates->get("pro_blog_comment_bit")."\";");
+		}
+
+		if(!$comment_list) $comment_list = "No comments yet.";
+
+		// Quick reply
+		$quick_reply = '';
+		if($mybb->user['uid'] > 0 && $announcement['closed'] == 0)
+		{
+			eval("\$quick_reply = \"".$templates->get("pro_blog_quick_reply")."\";");
+		}
+
+		add_breadcrumb($announcement['subject']);
+		eval("\$centerblocks = \"".$templates->get("pro_blog_announcement")."\";");
+
+		// Append comments to center blocks
+		$centerblocks .= "<div id='comments' style='margin-top:20px;'><h2>Comments</h2>{$comment_list}</div>";
+		$centerblocks .= $quick_reply;
+
+		// Post stats
+		$centerblocks .= "<div class='tborder' style='margin-top:10px; padding:10px;'>Stats: <span id='likes_count'>{$announcement['likes']}</span> Likes, {$announcement['views']} Views, {$announcement['comments_count']} Comments</div>";
+
+		// Report button logic
+		$report_btn = '';
+		if($mybb->user['uid'] > 0)
+		{
+			$report_btn = "<a href='blog.php?action=report&type=post&id={$id}'>Report</a>";
+		}
 
 		eval("\$blog = \"".$templates->get($blogtemplate)."\";");
 		$blog = $problog->page_title($blog, $announcement['subject']);
@@ -314,6 +434,64 @@ if($mybb->input['action'] == "view" && (int)$mybb->input['id'] > 0)
 	{
 		redirect("blog.php");
 	}
+}
+
+// Handle Reports
+if($mybb->input['action'] == "report")
+{
+	$id = (int)$mybb->input['id'];
+	$type = $db->escape_string($mybb->input['type']);
+
+	if($mybb->user['uid'] == 0) error_no_permission();
+
+	eval("\$report_form = \"".$templates->get("pro_blog_report")."\";");
+	$centerblocks = $report_form;
+	eval("\$blog = \"".$templates->get($blogtemplate)."\";");
+	output_page($blog);
+	exit;
+}
+
+if($mybb->input['action'] == "do_report" && $mybb->request_method == "post")
+{
+	verify_post_check($mybb->input['my_post_key']);
+	$id = (int)$mybb->input['id'];
+	$type = $db->escape_string($mybb->input['type']);
+	$reason = $db->escape_string($mybb->input['reason']);
+
+	if($mybb->user['uid'] > 0 && !empty($reason))
+	{
+		$insert_array = array(
+			"id" => $id,
+			"type" => $type,
+			"uid" => $mybb->user['uid'],
+			"reason" => $reason,
+			"dateline" => TIME_NOW
+		);
+		$db->insert_query("blog_reports", $insert_array);
+	}
+	redirect("blog.php", "Thank you for your report.");
+}
+
+// Handle comment submission
+if($mybb->input['action'] == "do_comment" && $mybb->request_method == "post")
+{
+	verify_post_check($mybb->input['my_post_key']);
+	$pid = (int)$mybb->input['pid'];
+	$content = $db->escape_string($mybb->input['message']);
+
+	if($mybb->user['uid'] > 0 && !empty($content))
+	{
+		$insert_array = array(
+			"post_id" => $pid,
+			"uid" => $mybb->user['uid'],
+			"content" => $content,
+			"dateline" => TIME_NOW,
+			"ipaddress" => my_inet_pton(get_ip())
+		);
+		$db->insert_query("blog_comments", $insert_array);
+		$db->write_query("UPDATE ".TABLE_PREFIX."blog_posts SET comments_count = comments_count + 1 WHERE pid = '{$pid}'");
+	}
+	redirect("blog.php?action=view&id={$pid}#comments");
 }
 elseif ($pages !== '')
 {

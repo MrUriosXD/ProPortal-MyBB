@@ -1,9 +1,9 @@
 <?php
 /***************************************************************
  * ProBlog
- * Copyright \xa9 2010 ProMyBB, All Rights Reserved
+ * Copyright © 2010 ProMyBB, All Rights Reserved
  *
- * Website: http://www.promybb.com
+ * Website: http://www.promybb.com/
  *
  * MyBB Installation Wizard originally written by MyBB Group
  * Website: http://www.mybboard.net
@@ -42,19 +42,26 @@ $tables[] = "CREATE TABLE `mybb_blog_settings` (
 $tables[] = "CREATE TABLE `mybb_blog_posts` (
   `pid` int(10) NOT NULL auto_increment,
   `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
   `content` text NOT NULL,
+  `tags` varchar(255) NOT NULL,
   `uid` int(10) NOT NULL default '0',
+  `cid` int(10) NOT NULL default '0',
   `dateline` bigint(30) NOT NULL default '0',
   `views` int(10) NOT NULL default '0',
   `likes` int(10) NOT NULL default '0',
   `comments_count` int(10) NOT NULL default '0',
+  `closed` smallint(1) NOT NULL default '0',
+  `archived` smallint(1) NOT NULL default '0',
   `enabled` smallint(1) NOT NULL default '1',
+  `ipaddress` varbinary(16) NOT NULL default '',
   PRIMARY KEY  (`pid`)
 ) ENGINE=MyISAM;";
 
 $tables[] = "CREATE TABLE `mybb_blog_categories` (
   `cid` int(10) NOT NULL auto_increment,
   `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
   PRIMARY KEY  (`cid`)
 ) ENGINE=MyISAM;";
 
@@ -64,7 +71,27 @@ $tables[] = "CREATE TABLE `mybb_blog_comments` (
   `uid` int(10) NOT NULL,
   `content` text NOT NULL,
   `dateline` bigint(30) NOT NULL default '0',
+  `ipaddress` varbinary(16) NOT NULL default '',
   PRIMARY KEY  (`cid`)
+) ENGINE=MyISAM;";
+
+$tables[] = "CREATE TABLE `mybb_blog_likes` (
+  `lid` int(10) NOT NULL auto_increment,
+  `pid` int(10) NOT NULL,
+  `uid` int(10) NOT NULL,
+  `dateline` bigint(30) NOT NULL default '0',
+  PRIMARY KEY (`lid`)
+) ENGINE=MyISAM;";
+
+$tables[] = "CREATE TABLE `mybb_blog_reports` (
+  `rid` int(10) NOT NULL auto_increment,
+  `id` int(10) NOT NULL,
+  `type` varchar(10) NOT NULL,
+  `uid` int(10) NOT NULL,
+  `reason` text NOT NULL,
+  `dateline` bigint(30) NOT NULL default '0',
+  `is_read` smallint(1) NOT NULL default '0',
+  PRIMARY KEY (`rid`)
 ) ENGINE=MyISAM;";
 
 ?>

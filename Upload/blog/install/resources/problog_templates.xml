@@ -31,12 +31,12 @@
 </html>]]></template>
 			<template name="pro_blog_announcement" version="1400"><![CDATA[<table cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
 <tr>
-<td class="thead"><strong>{$icon} <a href="{$mybb->settings['bburl']}/{$announcement['threadlink']}">{$announcement['subject']}</a></strong></td>
+<td class="thead"><strong>{$icon} <a href="{$announcement['threadlink']}">{$announcement['subject']}</a></strong></td>
 </tr>
 <tr>
 <td class="trow2" align="right" valign="middle">
 <span style="float: left;">{$avatar}</span>
-<span class="smalltext">{$lang->posted_by} {$profilelink} - {$anndate} {$anntime}<br />{$views} {$numcomments}</span>
+<span class="smalltext">{$lang->posted_by} {$profilelink} - {$anndate} {$anntime}<br />{$views} {$numcomments} {$likes}</span>
 </td>
 </tr>
 <tr>
@@ -44,10 +44,9 @@
 <table border="0" cellpadding="{$theme['tablespace']}" width="100%">
 	<tr>
 		<td class="trow1" style="border: 0px;">
-			<p style="margin: -2px 0;">
+			<div style="margin: -2px 0;">
 				{$message}
-			</p>
-			{$post['attachments']}
+			</div>
 		</td>
 	</tr>
 </table>
@@ -56,7 +55,7 @@
 <tr>
 <td class="trow2" align="right" valign="middle">
 <span class="smalltext">
-<a href="{$mybb->settings['bburl']}/printthread.php?tid={$announcement['tid']}"><img src="{$mybb->settings['bburl']}/{$theme['imgdir']}/printable.gif" alt="{$lang->print_this_item}" title="{$lang->print_this_item}" /></a>&nbsp;<a href="{$mybb->settings['bburl']}/sendthread.php?tid={$announcement['tid']}"><img src="{$mybb->settings['bburl']}/{$theme['imgdir']}/send.gif" alt="{$lang->send_to_friend}" title="{$lang->send_to_friend}" /></a>
+{$like_btn}
 </span>
 </td>
 </tr>
@@ -140,5 +139,37 @@
 {$footer}
 </body>
 </html>]]></template>
+			<template name="pro_blog_comment_bit" version="1400"><![CDATA[<div class="tborder" style="margin-bottom: 10px; padding: 10px;">
+<strong>{$comment['username']}</strong> - <span class="smalltext">{$comment['date']}</span>
+<div style="margin-top: 5px;">{$comment['content']}</div>
+</div>]]></template>
+			<template name="pro_blog_quick_reply" version="1400"><![CDATA[<div style="margin-top: 20px;">
+<form method="post" action="blog.php?action=do_comment">
+<input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+<input type="hidden" name="pid" value="{$id}" />
+<table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+<tr><td class="thead"><strong>Post a Comment</strong></td></tr>
+<tr><td class="trow1"><textarea name="message" rows="5" style="width: 95%"></textarea></td></tr>
+<tr><td class="trow2" align="center"><input type="submit" class="button" value="Submit Comment" /></td></tr>
+</table>
+</form>
+</div>]]></template>
+			<template name="pro_blog_report" version="1400"><![CDATA[<div style="margin-top: 20px;">
+<form method="post" action="blog.php?action=do_report">
+<input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+<input type="hidden" name="id" value="{$id}" />
+<input type="hidden" name="type" value="{$type}" />
+<table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+<tr><td class="thead"><strong>Report Item</strong></td></tr>
+<tr><td class="trow1">Please enter the reason for reporting this item:</td></tr>
+<tr><td class="trow1"><textarea name="reason" rows="5" style="width: 95%"></textarea></td></tr>
+<tr><td class="trow2" align="center"><input type="submit" class="button" value="Send Report" /></td></tr>
+</table>
+</form>
+</div>]]></template>
+			<template name="pro_blog_search" version="1400"><![CDATA[<table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+<tr><td class="thead"><strong>{$lang->search_results}</strong></td></tr>
+<tr><td class="trow1">{$search_results}</td></tr>
+</table>]]></template>
 	</templates>
 </theme>

@@ -21,11 +21,20 @@ function blog_meta()
 {
 	global $page, $lang, $plugins, $problog;
 
+    $lang->load("problog_info");
+    $lang->load("problog_posts");
+    $lang->load("problog_categories");
+    $lang->load("problog_blocks");
+    $lang->load("problog_pages");
+    $lang->load("problog_settings");
+
 	$sub_menu = array();
 	$sub_menu['10'] = array("id" => "info", "title" => $lang->blog_info, "link" => "index.php?module=problog/info");
 	$sub_menu['15'] = array("id" => "posts", "title" => $lang->blog_posts_management, "link" => "index.php?module=problog/posts");
+	$sub_menu['17'] = array("id" => "categories", "title" => $lang->blog_categories_management, "link" => "index.php?module=problog/categories");
 	$sub_menu['20'] = array("id" => "blocks", "title" => $lang->blog_block_management, "link" => "index.php?module=problog/blocks");
 	$sub_menu['30'] = array("id" => "pages", "title" => $lang->blog_page_management, "link" => "index.php?module=problog/pages");
+	$sub_menu['35'] = array("id" => "reports", "title" => $lang->blog_reports_management, "link" => "index.php?module=problog/reports");
 	$sub_menu['40'] = array("id" => "settings", "title" => $lang->blog_settings, "link" => "index.php?module=problog/settings");
 
 	$plugins->run_hooks("admin_blog_menu", $sub_menu);
@@ -46,6 +55,8 @@ function blog_action_handler($action)
 		'blocks' => array('active' => 'blocks', 'file' => 'blocks.php'),
 		'pages' => array('active' => 'pages', 'file' => 'pages.php'),
 		'posts' => array('active' => 'posts', 'file' => 'posts.php'),
+		'categories' => array('active' => 'categories', 'file' => 'categories.php'),
+		'reports' => array('active' => 'reports', 'file' => 'reports.php'),
 		'info' => array('active' => 'info', 'file' => 'info.php')
 	);
 

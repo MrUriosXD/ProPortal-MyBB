@@ -36,8 +36,23 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
 
 	$form_container = new FormContainer($mybb->input['action'] == "edit" ? $lang->blog_posts_edit : $lang->blog_posts_add);
 	$form_container->output_row($lang->blog_posts_title, $lang->blog_posts_title_desc, $form->generate_text_box('title', $post['title'], array('id' => 'title')), 'title');
+
+    // Category selection
+    $query = $db->simple_select("blog_categories", "cid, name", "", array("order_by" => "name", "order_dir" => "ASC"));
+    $categories = array();
+    while($category = $db->fetch_array($query))
+    {
+        $categories[$category['cid']] = $category['name'];
+    }
+    $form_container->output_row($lang->blog_posts_category, $lang->blog_posts_category_desc, $form->generate_select_box('cid', $categories, $post['cid'], array('id' => 'cid')), 'cid');
+
+	$form_container->output_row($lang->blog_posts_description, $lang->blog_posts_description_desc, $form->generate_text_area('description', $post['description'], array('id' => 'description')), 'description');
 	$form_container->output_row($lang->blog_posts_content, $lang->blog_posts_content_desc, $form->generate_text_area('content', $post['content'], array('id' => 'content')), 'content');
-	$form_container->output_row($lang->blog_posts_enabled, $lang->blog_posts_enabled_desc, $form->generate_yes_no_radio('enabled', $post['enabled'] ?? 1));
+    $form_container->output_row($lang->blog_posts_tags, $lang->blog_posts_tags_desc, $form->generate_text_box('tags', $post['tags'], array('id' => 'tags')), 'tags');
+
+    $form_container->output_row($lang->blog_posts_enabled, $lang->blog_posts_enabled_desc, $form->generate_yes_no_radio('enabled', $post['enabled'] ?? 1));
+    $form_container->output_row($lang->blog_posts_closed, $lang->blog_posts_closed_desc, $form->generate_yes_no_radio('closed', $post['closed'] ?? 0));
+    $form_container->output_row($lang->blog_posts_archived, $lang->blog_posts_archived_desc, $form->generate_yes_no_radio('archived', $post['archived'] ?? 0));
 
 	$form_container->end();
 
@@ -58,8 +73,13 @@ if($mybb->input['action'] == "do_add")
 
 	$post_data = array(
 		"title" => $db->escape_string($mybb->input['title']),
+        "cid" => (int)$mybb->input['cid'],
+        "description" => $db->escape_string($mybb->input['description']),
 		"content" => $db->escape_string($mybb->input['content']),
+        "tags" => $db->escape_string($mybb->input['tags']),
 		"enabled" => (int)$mybb->input['enabled'],
+        "closed" => (int)$mybb->input['closed'],
+        "archived" => (int)$mybb->input['archived'],
 	);
 
 	if($mybb->input['edit'])
@@ -71,6 +91,7 @@ if($mybb->input['action'] == "do_add")
 	{
 		$post_data['uid'] = $mybb->user['uid'];
 		$post_data['dateline'] = TIME_NOW;
+        $post_data['ipaddress'] = my_inet_pton(get_ip());
 		$db->insert_query("blog_posts", $post_data);
 		flash_message($lang->blog_posts_success_added, 'success');
 	}
@@ -104,6 +125,7 @@ if(!$mybb->input['action'])
 	$table = new Table;
 	$table->construct_header($lang->blog_posts_title);
 	$table->construct_header($lang->blog_posts_date, array("class" => "align_center", "width" => "150"));
+    $table->construct_header($lang->blog_posts_status, array("class" => "align_center", "width" => "100"));
 	$table->construct_header($lang->options, array("class" => "align_center", "width" => "150"));
 
 	$query = $db->simple_select("blog_posts", "*", "", array("order_by" => "dateline", "order_dir" => "DESC"));
@@ -112,8 +134,14 @@ if(!$mybb->input['action'])
 		$post['title'] = htmlspecialchars_uni($post['title']);
 		$post['date'] = my_date($mybb->settings['dateformat'], $post['dateline']).", ".my_date($mybb->settings['timeformat'], $post['dateline']);
 
+        $status = array();
+        if($post['enabled']) $status[] = "<span style='color:green'>Enabled</span>"; else $status[] = "<span style='color:red'>Disabled</span>";
+        if($post['closed']) $status[] = "<span style='color:orange'>Closed</span>";
+        if($post['archived']) $status[] = "<span style='color:blue'>Archived</span>";
+
 		$table->construct_cell($post['title']);
 		$table->construct_cell($post['date'], array("class" => "align_center"));
+        $table->construct_cell(implode("<br />", $status), array("class" => "align_center"));
 
 		$popup = new PopupMenu("post_{$post['pid']}", $lang->options);
 		$popup->add_item($lang->edit, "index.php?module=problog/posts&amp;action=edit&amp;pid={$post['pid']}");
@@ -124,7 +152,7 @@ if(!$mybb->input['action'])
 
 	if($table->num_rows() == 0)
 	{
-		$table->construct_cell($lang->blog_posts_no_posts, array("colspan" => 3));
+		$table->construct_cell($lang->blog_posts_no_posts, array("colspan" => 4));
 		$table->construct_row();
 	}
 

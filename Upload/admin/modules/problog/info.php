@@ -1,6 +1,6 @@
 <?php
 /***************************************************************
- * ProBlog - AdminCP Info / Estadísticas
+ * ProBlog - AdminCP Info / Statistics
  ***************************************************************/
 
 if(!defined("IN_MYBB"))
@@ -36,6 +36,7 @@ if($mybb->input['action'] == "version_check")
 		"last_check" => TIME_NOW
 	);
 
+	// Use a placeholder or a generic update check URL
 	$filedata = @file("https://raw.githubusercontent.com/MrUriosXD/ProBlog/main/version_check.xml");
 	$contents = is_array($filedata) ? implode("", $filedata) : '';
 
@@ -56,19 +57,26 @@ if($mybb->input['action'] == "version_check")
 	$parser = create_xml_parser($contents);
 	$tree = $parser->get_tree();
 
-	$latest_code = (int)$tree['problog']['version_code']['value'];
-	$latest_version = "<strong>".htmlspecialchars_uni($tree['problog']['latest_version']['value'])."</strong> (".$latest_code.")";
-	if($latest_code > $problog->pversion_code)
+	if(isset($tree['problog']))
 	{
-		$latest_version = "<span style=\"color: #C00;\">".$latest_version."</span>";
-		$updated_cache['latest_version'] = $latest_version;
-		$updated_cache['latest_version_code'] = $latest_code;
-		$page->output_error("<p><em>{$lang->error_out_of_date}</em> {$lang->update_forum}</p>");
+		$latest_code = (int)$tree['problog']['version_code']['value'];
+		$latest_version = "<strong>".htmlspecialchars_uni($tree['problog']['latest_version']['value'])."</strong> (".$latest_code.")";
+		if($latest_code > $problog->pversion_code)
+		{
+			$latest_version = "<span style=\"color: #C00;\">".$latest_version."</span>";
+			$updated_cache['latest_version'] = $latest_version;
+			$updated_cache['latest_version_code'] = $latest_code;
+			$page->output_error("<p><em>{$lang->error_out_of_date}</em> {$lang->update_forum}</p>");
+		}
+		else
+		{
+			$latest_version = "<span style=\"color: green;\">".$latest_version."</span>";
+			$page->output_success("<p><em>{$lang->success_up_to_date}</em></p>");
+		}
 	}
 	else
 	{
-		$latest_version = "<span style=\"color: green;\">".$latest_version."</span>";
-		$page->output_success("<p><em>{$lang->success_up_to_date}</em></p>");
+		$latest_version = "Unknown";
 	}
 
 	$table = new Table;
@@ -86,18 +94,16 @@ if($mybb->input['action'] == "version_check")
 
 	require_once MYBB_ROOT."inc/class_feedparser.php";
 	$feed_parser = new FeedParser();
-	$feed_parser->parse_feed("https://raw.githubusercontent.com/MrUriosXD/ProBlog/main/version_check.xml");
+	// Using MyBB news as a fallback for Latest News from ProBlog project
+	$feed_parser->parse_feed("https://blog.mybb.com/feed/");
 
 	$updated_cache['news'] = array();
 
 	if($feed_parser->error == '')
 	{
-		require_once MYBB_ROOT . '/inc/class_parser.php';
-		$post_parser = new postParser();
-
 		foreach($feed_parser->items as $item)
 		{
-			if(!isset($updated_cache['news'][2]))
+			if(count($updated_cache['news']) < 3)
 			{
 				$updated_cache['news'][] = array(
 					'title' => $item['title'],
@@ -124,9 +130,7 @@ if($mybb->input['action'] == "version_check")
 	}
 	else
 	{
-		$link = "index.php?module=problog/info&action=version_check";
-		$no_announcements = $lang->sprintf($lang->no_announcements, $link);
-		$table->construct_cell($no_announcements);
+		$table->construct_cell($lang->no_announcements);
 		$table->construct_row();
 	}
 
@@ -160,11 +164,6 @@ elseif(!$mybb->input['action'])
 		$total_comments   = (int)$db->fetch_field($db->simple_select("blog_comments", "COUNT(*)", ""), "COUNT(*)");
 		$query = $db->simple_select("blog_posts", "SUM(views) AS total_views");
 		$total_views      = (int)$db->fetch_field($query, "total_views");
-
-		$last_post          = $db->fetch_array($db->simple_select("blog_posts", "pid, title, dateline", "", array("order_by" => "dateline", "order_dir" => "DESC", "limit" => 1)));
-		$last_comment       = $db->fetch_array($db->simple_select("blog_comments", "cid, post_id, uid, dateline", "", array("order_by" => "dateline", "order_dir" => "DESC", "limit" => 1)));
-		$most_liked_post    = $db->fetch_array($db->simple_select("blog_posts", "pid, title, likes", "", array("order_by" => "likes", "order_dir" => "DESC", "limit" => 1)));
-		$most_commented_post= $db->fetch_array($db->simple_select("blog_posts", "pid, title, comments_count", "", array("order_by" => "comments_count", "order_dir" => "DESC", "limit" => 1)));
 	}
 
 	// -------------------------
@@ -197,9 +196,9 @@ elseif(!$mybb->input['action'])
 
 		],
 		'center' => [
-			"Estado:" =>
+			"Status:" =>
 				"Total: "					 . $blocksnum . "<br />" .
-				"Activos / Desactivados: "	 . $activeblocksnum . " / " . $passiveblocksnum,
+				"Active / Inactive: "	 . $activeblocksnum . " / " . $passiveblocksnum,
 
 			"Position:" =>
 				"Left: "			 		 . $leftblocksnum . "<br />" .
@@ -207,13 +206,13 @@ elseif(!$mybb->input['action'])
 				"Right: "			 		 . $rightblocksnum,
 		],
 		'right' => [
-			// Entradas
-			"Entradas:" =>
+			// Posts
+			"Posts:" =>
 				"Published: "				 . ($total_posts ?? 0) . "<br />" .
 				"Views: "					 . ($total_views ?? 0),
 
-			// Comentarios
-			"Comentarios:" =>
+			// Comments
+			"Comments:" =>
 				"Totals: "   				 . ($total_comments ?? 0),
 
 			// Categories
