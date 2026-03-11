@@ -15,7 +15,7 @@ if(!defined("IN_MYBB"))
 
 $lang->load("problog_blocks");
 
-$page->add_breadcrumb_item($lang->blog_block_management, "index.php?module=problog/blocks");
+$page->add_breadcrumb_item($lang->blog_block_management, "index.php?module=problog-blocks");
 
 if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit" || !$mybb->input['action'])
 {
@@ -23,18 +23,18 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit" || !$mybb
 	{
 		$sub_tabs['edit_block'] = array(
 			'title' => $lang->blog_blocks_edit,
-			'link' => "index.php?module=problog/blocks&amp;action=edit&amp;id=".$mybb->input['id'],
+			'link' => "index.php?module=problog-blocks&amp;action=edit&amp;id=".$mybb->input['id'],
 			'description' => $lang->blog_blocks_edit_description
 		);
 	} else {
 		$sub_tabs['blocks'] = array(
 			'title' => $lang->blog_block_management,
-			'link' => "index.php?module=problog/blocks",
+			'link' => "index.php?module=problog-blocks",
 			'description' => $lang->blog_blocks_description
 		);
 		$sub_tabs['add_block'] = array(
 			'title' => $lang->blog_blocks_add,
-			'link' => "index.php?module=problog/blocks&amp;action=add",
+			'link' => "index.php?module=problog-blocks&amp;action=add",
 			'description' => $lang->blog_blocks_add_description
 		);
 	}
@@ -63,7 +63,7 @@ if(!$mybb->input['action'])
 		log_admin_action();
 
 		flash_message($lang->blog_success_block_position_updated, 'success');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$query = $db->simple_select("blog_blocks", "*");
@@ -79,7 +79,7 @@ if(!$mybb->input['action'])
 
 		$table->output($lang->blog_manage_blocks);
 	} else {
-		$form = new Form("index.php?module=problog/blocks", "post");
+		$form = new Form("index.php?module=problog-blocks", "post");
 
 		$table = new Table;
 		$table->construct_header($lang->blog_blocks_title, array('width' => '25%'));
@@ -123,10 +123,10 @@ if(!$mybb->input['action'])
 
 			// Build options popup menu
 			$popup = new PopupMenu("block_{$block['id']}", $lang->blog_blocks_options);
-			$popup->add_item($lang->blog_blocks_editblock, "index.php?module=problog/blocks&amp;action=edit&amp;id={$block['id']}");
-			$popup->add_item($lang->blog_blocks_deleteblock, "index.php?module=problog/blocks&amp;action=delete&amp;id={$block['id']}");
-			if($block['enabled'] == "0"){ $popup->add_item($lang->blog_blocks_enableblock, "index.php?module=problog/blocks&amp;action=enable&amp;id={$block['id']}"); }
-			elseif($block['enabled'] == "1"){ $popup->add_item($lang->blog_blocks_disableblock, "index.php?module=problog/blocks&amp;action=disable&amp;id={$block['id']}"); }
+			$popup->add_item($lang->blog_blocks_editblock, "index.php?module=problog-blocks&amp;action=edit&amp;id={$block['id']}");
+			$popup->add_item($lang->blog_blocks_deleteblock, "index.php?module=problog-blocks&amp;action=delete&amp;id={$block['id']}");
+			if($block['enabled'] == "0"){ $popup->add_item($lang->blog_blocks_enableblock, "index.php?module=problog-blocks&amp;action=enable&amp;id={$block['id']}"); }
+			elseif($block['enabled'] == "1"){ $popup->add_item($lang->blog_blocks_disableblock, "index.php?module=problog-blocks&amp;action=disable&amp;id={$block['id']}"); }
 			$controls = $popup->fetch();
 
 			$table->construct_cell($block['title']);
@@ -188,7 +188,7 @@ if($mybb->input['action'] == "add")
 			log_admin_action($insert_array['title']);
 
 			flash_message($lang->blog_success_block_added, 'success');
-			admin_redirect("index.php?module=problog/blocks");
+			admin_redirect("index.php?module=problog-blocks");
 		}
 	}
 
@@ -196,7 +196,7 @@ if($mybb->input['action'] == "add")
 	$page->output_header($lang->blog_blocks_add);
 	$page->output_nav_tabs($sub_tabs, 'add_block');
 
-	$form = new Form("index.php?module=problog/blocks&amp;action=add", "post");
+	$form = new Form("index.php?module=problog-blocks&amp;action=add", "post");
 
 	if($errors)
 	{
@@ -293,7 +293,7 @@ if($mybb->input['action'] == "edit")
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$query = $db->simple_select("blog_blocks", "*", "id='{$mybb->input['id']}'");
@@ -301,7 +301,7 @@ if($mybb->input['action'] == "edit")
 	if(!$block_data)
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -340,7 +340,7 @@ if($mybb->input['action'] == "edit")
 			log_admin_action($update_array['title']);
 
 			flash_message($lang->blog_success_block_edited, 'success');
-			admin_redirect("index.php?module=problog/blocks");
+			admin_redirect("index.php?module=problog-blocks");
 		}
 	}
 
@@ -348,7 +348,7 @@ if($mybb->input['action'] == "edit")
 	$page->output_header($lang->blog_blocks_edit);
 	$page->output_nav_tabs($sub_tabs, 'edit_block');
 
-	$form = new Form("index.php?module=problog/blocks&amp;action=edit", "post");
+	$form = new Form("index.php?module=problog-blocks&amp;action=edit", "post");
 	echo $form->generate_hidden_field("id", $id);
 
 	if($errors)
@@ -461,13 +461,13 @@ if($mybb->input['action'] == "delete")
 	if(!verify_post_check($mybb->input['my_post_key']))
 	{
 		flash_message($lang->invalid_post_verify_key2, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$query = $db->simple_select("blog_blocks", "*", "id='{$mybb->input['id']}'");
@@ -475,7 +475,7 @@ if($mybb->input['action'] == "delete")
 	if(!$block_data)
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -487,7 +487,7 @@ if($mybb->input['action'] == "delete")
 	log_admin_action($id);
 
 	flash_message($lang->blog_success_block_deleted, 'success');
-	admin_redirect("index.php?module=problog/blocks");
+	admin_redirect("index.php?module=problog-blocks");
 }
 
 if($mybb->input['action'] == "enable")
@@ -497,7 +497,7 @@ if($mybb->input['action'] == "enable")
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$query = $db->simple_select("blog_blocks", "*", "id='{$mybb->input['id']}'");
@@ -505,7 +505,7 @@ if($mybb->input['action'] == "enable")
 	if(!$block_data)
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -521,7 +521,7 @@ if($mybb->input['action'] == "enable")
 	log_admin_action($id);
 
 	flash_message($lang->blog_success_block_enabled, 'success');
-	admin_redirect("index.php?module=problog/blocks");
+	admin_redirect("index.php?module=problog-blocks");
 }
 
 if($mybb->input['action'] == "disable")
@@ -531,7 +531,7 @@ if($mybb->input['action'] == "disable")
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$query = $db->simple_select("blog_blocks", "*", "id='{$mybb->input['id']}'");
@@ -539,7 +539,7 @@ if($mybb->input['action'] == "disable")
 	if(!$block_data)
 	{
 		flash_message($lang->blog_blocks_invalidid, 'error');
-		admin_redirect("index.php?module=problog/blocks");
+		admin_redirect("index.php?module=problog-blocks");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -555,6 +555,6 @@ if($mybb->input['action'] == "disable")
 	log_admin_action($id);
 
 	flash_message($lang->blog_success_block_disabled, 'success');
-	admin_redirect("index.php?module=problog/blocks");
+	admin_redirect("index.php?module=problog-blocks");
 }
 ?>

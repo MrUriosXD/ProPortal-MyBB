@@ -4,9 +4,7 @@
  * Copyright © 2010 ProMyBB, All Rights Reserved
  *
  * Website: http://www.promybb.com/
- *
- * MyBB Installation Wizard originally written by MyBB Group
- * Website: http://www.mybboard.net
+ * License: http://creativecommons.org/licenses/by-nc-sa/3.0/
  ***************************************************************/
 
 $tables[] = "CREATE TABLE `mybb_blog_blocks` (
@@ -53,6 +51,8 @@ $tables[] = "CREATE TABLE `mybb_blog_posts` (
   `comments_count` int(10) NOT NULL default '0',
   `closed` smallint(1) NOT NULL default '0',
   `archived` smallint(1) NOT NULL default '0',
+  `featured` smallint(1) NOT NULL default '0',
+  `image` varchar(255) NOT NULL default '',
   `enabled` smallint(1) NOT NULL default '1',
   `ipaddress` varbinary(16) NOT NULL default '',
   PRIMARY KEY  (`pid`)

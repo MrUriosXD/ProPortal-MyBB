@@ -10,7 +10,7 @@ if(!defined("IN_MYBB"))
 
 $lang->load('problog_posts');
 
-$page->add_breadcrumb_item($lang->blog_posts_management, "index.php?module=problog/posts");
+$page->add_breadcrumb_item($lang->blog_posts_management, "index.php?module=problog-posts");
 
 if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
 {
@@ -27,7 +27,7 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
 		$page->output_header($lang->blog_posts_add);
 	}
 
-	$form = new Form("index.php?module=problog/posts&amp;action=do_add", "post");
+	$form = new Form("index.php?module=problog-posts&amp;action=do_add", "post", "", 1);
 	if($mybb->input['action'] == "edit")
 	{
 		echo $form->generate_hidden_field("pid", $post['pid']);
@@ -46,6 +46,15 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
     }
     $form_container->output_row($lang->blog_posts_category, $lang->blog_posts_category_desc, $form->generate_select_box('cid', $categories, $post['cid'], array('id' => 'cid')), 'cid');
 
+    // Featured and Image
+    $form_container->output_row("Featured Post", "Display this post as featured?", $form->generate_yes_no_radio('featured', $post['featured'] ?? 0));
+    $form_container->output_row("Post Image", "Upload an image for this post.", $form->generate_file_upload_box('image'));
+    if(!empty($post['image']))
+    {
+        $image_preview = "<img src='../blog/images/{$post['image']}' style='max-width: 100px; display: block; margin-top: 5px;' />";
+        $form_container->output_row("Current Image", "", $image_preview);
+    }
+
 	$form_container->output_row($lang->blog_posts_description, $lang->blog_posts_description_desc, $form->generate_text_area('description', $post['description'], array('id' => 'description')), 'description');
 	$form_container->output_row($lang->blog_posts_content, $lang->blog_posts_content_desc, $form->generate_text_area('content', $post['content'], array('id' => 'content')), 'content');
     $form_container->output_row($lang->blog_posts_tags, $lang->blog_posts_tags_desc, $form->generate_text_box('tags', $post['tags'], array('id' => 'tags')), 'tags');
@@ -53,6 +62,10 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
     $form_container->output_row($lang->blog_posts_enabled, $lang->blog_posts_enabled_desc, $form->generate_yes_no_radio('enabled', $post['enabled'] ?? 1));
     $form_container->output_row($lang->blog_posts_closed, $lang->blog_posts_closed_desc, $form->generate_yes_no_radio('closed', $post['closed'] ?? 0));
     $form_container->output_row($lang->blog_posts_archived, $lang->blog_posts_archived_desc, $form->generate_yes_no_radio('archived', $post['archived'] ?? 0));
+
+    // Scheduling
+    $publish_date = $post['dateline'] ? my_date('Y-m-d\TH:i', $post['dateline']) : date('Y-m-d\TH:i');
+    $form_container->output_row("Publish Date", "Set a future date to schedule this post.", "<input type='datetime-local' name='publish_date' value='{$publish_date}' class='textbox' />");
 
 	$form_container->end();
 
@@ -68,8 +81,10 @@ if($mybb->input['action'] == "do_add")
 	if(!verify_post_check($mybb->input['my_post_key']))
 	{
 		flash_message($lang->invalid_post_verify_key2, 'error');
-		admin_redirect("index.php?module=problog/posts");
+		admin_redirect("index.php?module=problog-posts");
 	}
+
+    $dateline = strtotime($mybb->input['publish_date']) ?: TIME_NOW;
 
 	$post_data = array(
 		"title" => $db->escape_string($mybb->input['title']),
@@ -80,7 +95,20 @@ if($mybb->input['action'] == "do_add")
 		"enabled" => (int)$mybb->input['enabled'],
         "closed" => (int)$mybb->input['closed'],
         "archived" => (int)$mybb->input['archived'],
+        "featured" => (int)$mybb->input['featured'],
+        "dateline" => $dateline
 	);
+
+    // Image upload
+    if(!empty($_FILES['image']['name']))
+    {
+        $upload_dir = MYBB_ROOT."blog/images/";
+        $filename = time()."_".basename($_FILES['image']['name']);
+        if(move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir.$filename))
+        {
+            $post_data['image'] = $db->escape_string($filename);
+        }
+    }
 
 	if($mybb->input['edit'])
 	{
@@ -90,13 +118,12 @@ if($mybb->input['action'] == "do_add")
 	else
 	{
 		$post_data['uid'] = $mybb->user['uid'];
-		$post_data['dateline'] = TIME_NOW;
         $post_data['ipaddress'] = my_inet_pton(get_ip());
 		$db->insert_query("blog_posts", $post_data);
 		flash_message($lang->blog_posts_success_added, 'success');
 	}
 
-	admin_redirect("index.php?module=problog/posts");
+	admin_redirect("index.php?module=problog-posts");
 }
 
 if($mybb->input['action'] == "delete")
@@ -104,12 +131,12 @@ if($mybb->input['action'] == "delete")
 	if(!verify_post_check($mybb->input['my_post_key']))
 	{
 		flash_message($lang->invalid_post_verify_key2, 'error');
-		admin_redirect("index.php?module=problog/posts");
+		admin_redirect("index.php?module=problog-posts");
 	}
 
 	$db->delete_query("blog_posts", "pid='".(int)$mybb->input['pid']."'");
 	flash_message($lang->blog_posts_success_deleted, 'success');
-	admin_redirect("index.php?module=problog/posts");
+	admin_redirect("index.php?module=problog-posts");
 }
 
 if(!$mybb->input['action'])
@@ -118,12 +145,12 @@ if(!$mybb->input['action'])
 
 	$sub_tabs['posts'] = array(
 		'title' => $lang->blog_posts_management,
-		'link' => "index.php?module=problog/posts",
+		'link' => "index.php?module=problog-posts",
 		'description' => $lang->blog_posts_management_desc
 	);
 	$sub_tabs['add_post'] = array(
 		'title' => $lang->blog_posts_add,
-		'link' => "index.php?module=problog/posts&amp;action=add",
+		'link' => "index.php?module=problog-posts&amp;action=add",
 	);
 
 	$page->output_nav_tabs($sub_tabs, 'posts');
@@ -144,14 +171,16 @@ if(!$mybb->input['action'])
         if($post['enabled']) $status[] = "<span style='color:green'>Enabled</span>"; else $status[] = "<span style='color:red'>Disabled</span>";
         if($post['closed']) $status[] = "<span style='color:orange'>Closed</span>";
         if($post['archived']) $status[] = "<span style='color:blue'>Archived</span>";
+        if($post['featured']) $status[] = "<span style='color:purple; font-weight:bold;'>Featured</span>";
+        if($post['dateline'] > TIME_NOW) $status[] = "<span style='color:gray'>Scheduled</span>";
 
 		$table->construct_cell($post['title']);
 		$table->construct_cell($post['date'], array("class" => "align_center"));
         $table->construct_cell(implode("<br />", $status), array("class" => "align_center"));
 
 		$popup = new PopupMenu("post_{$post['pid']}", $lang->options);
-		$popup->add_item($lang->edit, "index.php?module=problog/posts&amp;action=edit&amp;pid={$post['pid']}");
-		$popup->add_item($lang->delete, "index.php?module=problog/posts&amp;action=delete&amp;pid={$post['pid']}&amp;my_post_key={$mybb->post_code}", "return confirm('{$lang->blog_posts_confirm_delete}')");
+		$popup->add_item($lang->edit, "index.php?module=problog-posts&amp;action=edit&amp;pid={$post['pid']}");
+		$popup->add_item($lang->delete, "index.php?module=problog-posts&amp;action=delete&amp;pid={$post['pid']}&amp;my_post_key={$mybb->post_code}", "return confirm('{$lang->blog_posts_confirm_delete}')");
 		$table->construct_cell($popup->fetch(), array("class" => "align_center"));
 		$table->construct_row();
 	}

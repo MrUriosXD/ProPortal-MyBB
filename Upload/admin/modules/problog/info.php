@@ -10,18 +10,18 @@ if(!defined("IN_MYBB"))
 
 $lang->load('problog_info');
 
-$page->add_breadcrumb_item($lang->blog_info, "index.php?module=problog/info");
+$page->add_breadcrumb_item($lang->blog_info, "index.php?module=problog-info");
 $plugins->run_hooks("admin_blog_info_begin");
 
 $sub_tabs['blog_info'] = array(
 	'title' => $lang->blog_info,
-	'link' => "index.php?module=problog/info",
+	'link' => "index.php?module=problog-info",
 	'description' => $lang->blog_info_description
 );
 
 $sub_tabs['version_check'] = array(
 	'title' => $lang->version_check,
-	'link' => "index.php?module=problog/info&amp;action=version_check",
+	'link' => "index.php?module=problog-info&amp;action=version_check",
 	'description' => $lang->version_check_description
 );
 
@@ -43,12 +43,12 @@ if($mybb->input['action'] == "version_check")
 	if(!$contents)
 	{
 		flash_message($lang->error_communication, 'error');
-		admin_redirect("index.php?module=problog/info");
+		admin_redirect("index.php?module=problog-info");
 	}
 
 	$plugins->run_hooks("admin_problog_version_check");
 
-	$page->add_breadcrumb_item($lang->version_check, "index.php?module=problog/info&amp;action=version_check");
+	$page->add_breadcrumb_item($lang->version_check, "index.php?module=problog-info&amp;action=version_check");
 	$page->output_header($lang->version_check);
 	$page->output_nav_tabs($sub_tabs, 'version_check');
 
@@ -273,7 +273,7 @@ elseif(!$mybb->input['action'])
 	}
 	else
 	{
-		$link = "index.php?module=problog/info&action=version_check";
+		$link = "index.php?module=problog-info&action=version_check";
 		$no_announcements = $lang->sprintf($lang->no_announcements, $link);
 		$table->construct_cell($no_announcements);
 		$table->construct_row();

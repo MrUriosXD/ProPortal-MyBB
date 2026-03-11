@@ -15,11 +15,11 @@ if(!defined("IN_MYBB"))
 
 $lang->load("problog_settings");
 
-$page->add_breadcrumb_item($lang->blog_settings, "index.php?module=problog/settings");
+$page->add_breadcrumb_item($lang->blog_settings, "index.php?module=problog-settings");
 
 $sub_tabs['settings'] = array(
 	'title' => $lang->blog_settings,
-	'link' => "index.php?module=problog/settings",
+	'link' => "index.php?module=problog-settings",
 	'description' => $lang->blog_settings_desc
 );
 
@@ -39,7 +39,7 @@ if(!$mybb->input['action'])
 		$settings_data[$settings['name']] = $settings['value'];
 	}
 
-	$form = new Form("index.php?module=problog/settings&amp;action=update", "post");
+	$form = new Form("index.php?module=problog-settings&amp;action=update", "post");
 
 	if($settings_data['blogcolumns'] == "left")
 	{
@@ -108,7 +108,7 @@ if($mybb->input['action'] == "update")
 		log_admin_action($lang->blog_settings_updated);
 
 		flash_message($lang->blog_success_settings_edited, 'success');
-		admin_redirect("index.php?module=problog/settings");
+		admin_redirect("index.php?module=problog-settings");
 	}
 }
 ?>

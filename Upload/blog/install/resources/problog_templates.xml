@@ -38,7 +38,7 @@
 <tr>
 <td class="trow2" align="right" valign="middle">
 <span style="float: left;">{$avatar}</span>
-<span class="smalltext">{$lang->posted_by} {$profilelink} - {$anndate} {$anntime}<br />{$views} {$numcomments} {$likes}</span>
+<span class="smalltext">{$lang->posted_by} {$profilelink} - {$anndate} {$anntime}<br />{$views} {$numcomments} {$likes} {$liked_by}</span>
 </td>
 </tr>
 <tr>

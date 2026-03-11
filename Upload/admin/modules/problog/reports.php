@@ -10,13 +10,13 @@ if(!defined("IN_MYBB"))
 
 $lang->load('problog_reports');
 
-$page->add_breadcrumb_item($lang->blog_reports_management, "index.php?module=problog/reports");
+$page->add_breadcrumb_item($lang->blog_reports_management, "index.php?module=problog-reports");
 
 if($mybb->input['action'] == "delete")
 {
 	$db->delete_query("blog_reports", "rid='".(int)$mybb->input['rid']."'");
 	flash_message($lang->blog_reports_success_deleted, 'success');
-	admin_redirect("index.php?module=problog/reports");
+	admin_redirect("index.php?module=problog-reports");
 }
 
 if(!$mybb->input['action'])
@@ -42,7 +42,7 @@ if(!$mybb->input['action'])
 		$table->construct_cell(htmlspecialchars_uni($report['username']), array("class" => "align_center"));
 
 		$popup = new PopupMenu("report_{$report['rid']}", $lang->options);
-		$popup->add_item($lang->delete, "index.php?module=problog/reports&amp;action=delete&amp;rid={$report['rid']}&amp;my_post_key={$mybb->post_code}");
+		$popup->add_item($lang->delete, "index.php?module=problog-reports&amp;action=delete&amp;rid={$report['rid']}&amp;my_post_key={$mybb->post_code}");
 		$table->construct_cell($popup->fetch(), array("class" => "align_center"));
 		$table->construct_row();
 	}

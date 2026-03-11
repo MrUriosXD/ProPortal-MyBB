@@ -29,7 +29,7 @@ while($setting = $db->fetch_array($query))
 }
 $problog->settings = &$settings;
 
-$page->add_breadcrumb_item($lang->blog_page_management, "index.php?module=problog/pages");
+$page->add_breadcrumb_item($lang->blog_page_management, "index.php?module=problog-pages");
 
 if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit" || !$mybb->input['action'])
 {
@@ -37,18 +37,18 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit" || !$mybb
 	{
 		$sub_tabs['edit_page'] = array(
 			'title' => $lang->blog_pages_edit,
-			'link' => "index.php?module=problog/pages&amp;action=edit&amp;id=".$mybb->input['id'],
+			'link' => "index.php?module=problog-pages&amp;action=edit&amp;id=".$mybb->input['id'],
 			'description' => $lang->blog_pages_edit_description
 		);
 	} else {
 		$sub_tabs['pages'] = array(
 			'title' => $lang->blog_pages_management,
-			'link' => "index.php?module=problog/pages",
+			'link' => "index.php?module=problog-pages",
 			'description' => $lang->blog_pages_description
 		);
 		$sub_tabs['add_page'] = array(
 			'title' => $lang->blog_pages_add,
-			'link' => "index.php?module=problog/pages&amp;action=add",
+			'link' => "index.php?module=problog-pages&amp;action=add",
 			'description' => $lang->blog_pages_add_description
 		);
 	}
@@ -106,10 +106,10 @@ if(!$mybb->input['action'])
 
 			// Build options popup menu
 			$popup = new PopupMenu("block_{$mypage['id']}", $lang->blog_pages_options);
-			$popup->add_item($lang->blog_pages_editpage, "index.php?module=problog/pages&amp;action=edit&amp;id={$mypage['id']}");
-			$popup->add_item($lang->blog_pages_deletepage, "index.php?module=problog/pages&amp;action=delete&amp;id={$mypage['id']}");
-			if($mypage['enabled'] == "0"){ $popup->add_item($lang->blog_pages_enablepage, "index.php?module=problog/pages&amp;action=enable&amp;id={$mypage['id']}"); }
-			elseif($mypage['enabled'] == "1"){ $popup->add_item($lang->blog_pages_disablepage, "index.php?module=problog/pages&amp;action=disable&amp;id={$mypage['id']}"); }
+			$popup->add_item($lang->blog_pages_editpage, "index.php?module=problog-pages&amp;action=edit&amp;id={$mypage['id']}");
+			$popup->add_item($lang->blog_pages_deletepage, "index.php?module=problog-pages&amp;action=delete&amp;id={$mypage['id']}");
+			if($mypage['enabled'] == "0"){ $popup->add_item($lang->blog_pages_enablepage, "index.php?module=problog-pages&amp;action=enable&amp;id={$mypage['id']}"); }
+			elseif($mypage['enabled'] == "1"){ $popup->add_item($lang->blog_pages_disablepage, "index.php?module=problog-pages&amp;action=disable&amp;id={$mypage['id']}"); }
 			$popup->add_item($lang->blog_pages_viewpage, "{$mybb->settings['bburl']}/blog.php?pages={$mypage['name']}\" target=\"_blank");
 			$controls = $popup->fetch();
 
@@ -180,7 +180,7 @@ if($mybb->input['action'] == "add")
 			log_admin_action($insert_array['title']);
 
 			flash_message($lang->blog_success_page_added, 'success');
-			admin_redirect("index.php?module=problog/pages");
+			admin_redirect("index.php?module=problog-pages");
 		}
 	}
 
@@ -188,7 +188,7 @@ if($mybb->input['action'] == "add")
 	$page->output_header($lang->blog_pages_add);
 	$page->output_nav_tabs($sub_tabs, 'add_page');
 
-	$form = new Form("index.php?module=problog/pages&amp;action=add", "post");
+	$form = new Form("index.php?module=problog-pages&amp;action=add", "post");
 
 	if($errors)
 	{
@@ -251,7 +251,7 @@ if($mybb->input['action'] == "edit")
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$query = $db->simple_select("blog_pages", "*", "id='{$mybb->input['id']}'");
@@ -259,7 +259,7 @@ if($mybb->input['action'] == "edit")
 	if(!$page_data)
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -305,7 +305,7 @@ if($mybb->input['action'] == "edit")
 			log_admin_action($update_array['title']);
 
 			flash_message($lang->blog_success_page_edited, 'success');
-			admin_redirect("index.php?module=problog/pages");
+			admin_redirect("index.php?module=problog-pages");
 		}
 	}
 
@@ -313,7 +313,7 @@ if($mybb->input['action'] == "edit")
 	$page->output_header($lang->blog_pages_edit);
 	$page->output_nav_tabs($sub_tabs, 'edit_page');
 
-	$form = new Form("index.php?module=problog/pages&amp;action=edit", "post");
+	$form = new Form("index.php?module=problog-pages&amp;action=edit", "post");
 	echo $form->generate_hidden_field("id", $id);
 
 	if($errors)
@@ -371,13 +371,13 @@ if($mybb->input['action'] == "delete")
 	if(!verify_post_check($mybb->input['my_post_key']))
 	{
 		flash_message($lang->invalid_post_verify_key2, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$query = $db->simple_select("blog_pages", "*", "id='{$mybb->input['id']}'");
@@ -385,7 +385,7 @@ if($mybb->input['action'] == "delete")
 	if(!$page_data)
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -397,7 +397,7 @@ if($mybb->input['action'] == "delete")
 	log_admin_action($id);
 
 	flash_message($lang->blog_success_page_deleted, 'success');
-	admin_redirect("index.php?module=problog/pages");
+	admin_redirect("index.php?module=problog-pages");
 }
 
 if($mybb->input['action'] == "enable")
@@ -407,7 +407,7 @@ if($mybb->input['action'] == "enable")
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$query = $db->simple_select("blog_pages", "*", "id='{$mybb->input['id']}'");
@@ -415,7 +415,7 @@ if($mybb->input['action'] == "enable")
 	if(!$page_data)
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -431,7 +431,7 @@ if($mybb->input['action'] == "enable")
 	log_admin_action($id);
 
 	flash_message($lang->blog_success_page_enabled, 'success');
-	admin_redirect("index.php?module=problog/pages");
+	admin_redirect("index.php?module=problog-pages");
 }
 
 if($mybb->input['action'] == "disable")
@@ -441,7 +441,7 @@ if($mybb->input['action'] == "disable")
 	if(!$mybb->input['id'])
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$query = $db->simple_select("blog_pages", "*", "id='{$mybb->input['id']}'");
@@ -449,7 +449,7 @@ if($mybb->input['action'] == "disable")
 	if(!$page_data)
 	{
 		flash_message($lang->blog_pages_invalidid, 'error');
-		admin_redirect("index.php?module=problog/pages");
+		admin_redirect("index.php?module=problog-pages");
 	}
 
 	$id = intval($mybb->input['id']);
@@ -465,6 +465,6 @@ if($mybb->input['action'] == "disable")
 	log_admin_action($id);
 
 	flash_message($lang->blog_success_page_disabled, 'success');
-	admin_redirect("index.php?module=problog/pages");
+	admin_redirect("index.php?module=problog-pages");
 }
 ?>

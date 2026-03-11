@@ -10,7 +10,7 @@ if(!defined("IN_MYBB"))
 
 $lang->load('problog_categories');
 
-$page->add_breadcrumb_item($lang->blog_categories_management, "index.php?module=problog/categories");
+$page->add_breadcrumb_item($lang->blog_categories_management, "index.php?module=problog-categories");
 
 if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
 {
@@ -27,7 +27,7 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
 		$page->output_header($lang->blog_categories_add);
 	}
 
-	$form = new Form("index.php?module=problog/categories&amp;action=do_add", "post");
+	$form = new Form("index.php?module=problog-categories&amp;action=do_add", "post");
 	if($mybb->input['action'] == "edit")
 	{
 		echo $form->generate_hidden_field("cid", $category['cid']);
@@ -52,7 +52,7 @@ if($mybb->input['action'] == "do_add")
 	if(!verify_post_check($mybb->input['my_post_key']))
 	{
 		flash_message($lang->invalid_post_verify_key2, 'error');
-		admin_redirect("index.php?module=problog/categories");
+		admin_redirect("index.php?module=problog-categories");
 	}
 
 	$category_data = array(
@@ -71,7 +71,7 @@ if($mybb->input['action'] == "do_add")
 		flash_message($lang->blog_categories_success_added, 'success');
 	}
 
-	admin_redirect("index.php?module=problog/categories");
+	admin_redirect("index.php?module=problog-categories");
 }
 
 if($mybb->input['action'] == "delete")
@@ -79,12 +79,12 @@ if($mybb->input['action'] == "delete")
 	if(!verify_post_check($mybb->input['my_post_key']))
 	{
 		flash_message($lang->invalid_post_verify_key2, 'error');
-		admin_redirect("index.php?module=problog/categories");
+		admin_redirect("index.php?module=problog-categories");
 	}
 
 	$db->delete_query("blog_categories", "cid='".(int)$mybb->input['cid']."'");
 	flash_message($lang->blog_categories_success_deleted, 'success');
-	admin_redirect("index.php?module=problog/categories");
+	admin_redirect("index.php?module=problog-categories");
 }
 
 if(!$mybb->input['action'])
@@ -93,12 +93,12 @@ if(!$mybb->input['action'])
 
 	$sub_tabs['categories'] = array(
 		'title' => $lang->blog_categories_management,
-		'link' => "index.php?module=problog/categories",
+		'link' => "index.php?module=problog-categories",
 		'description' => $lang->blog_categories_management_desc
 	);
 	$sub_tabs['add_category'] = array(
 		'title' => $lang->blog_categories_add,
-		'link' => "index.php?module=problog/categories&amp;action=add",
+		'link' => "index.php?module=problog-categories&amp;action=add",
 	);
 
 	$page->output_nav_tabs($sub_tabs, 'categories');
@@ -113,8 +113,8 @@ if(!$mybb->input['action'])
 		$table->construct_cell(htmlspecialchars_uni($category['name']));
 
 		$popup = new PopupMenu("category_{$category['cid']}", $lang->options);
-		$popup->add_item($lang->edit, "index.php?module=problog/categories&amp;action=edit&amp;cid={$category['cid']}");
-		$popup->add_item($lang->delete, "index.php?module=problog/categories&amp;action=delete&amp;cid={$category['cid']}&amp;my_post_key={$mybb->post_code}", "return confirm('{$lang->blog_categories_confirm_delete}')");
+		$popup->add_item($lang->edit, "index.php?module=problog-categories&amp;action=edit&amp;cid={$category['cid']}");
+		$popup->add_item($lang->delete, "index.php?module=problog-categories&amp;action=delete&amp;cid={$category['cid']}&amp;my_post_key={$mybb->post_code}", "return confirm('{$lang->blog_categories_confirm_delete}')");
 		$table->construct_cell($popup->fetch(), array("class" => "align_center"));
 		$table->construct_row();
 	}

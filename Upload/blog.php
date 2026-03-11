@@ -76,6 +76,19 @@ $problog->settings = &$settings;
 $mod_groups = explode(",", $problog->settings['moderator_groups']);
 $is_mod = in_array($mybb->user['usergroup'], $mod_groups) || $mybb->usergroup['cancp'] == 1;
 
+// AJAX Search Support
+if($mybb->input['ajax'] == 1 && $mybb->input['action'] == "search")
+{
+    $keywords = $db->escape_string($mybb->input['keywords']);
+    $query = $db->simple_select("blog_posts", "pid, title", "enabled='1' AND dateline <= ".TIME_NOW." AND (title LIKE '%{$keywords}%')", array("limit" => 5));
+    while($post = $db->fetch_array($query))
+    {
+        echo "<div style='padding: 2px; border-bottom: 1px solid #eee;'><a href='blog.php?action=view&id={$post['pid']}' class='smalltext'>".htmlspecialchars_uni($post['title'])."</a></div>";
+    }
+    if($db->num_rows($query) == 0) echo "<span class='smalltext'>No results.</span>";
+    exit;
+}
+
 // Handle Like Action (AJAX)
 if($mybb->input['action'] == "like" && $mybb->user['uid'] > 0)
 {
@@ -156,7 +169,7 @@ if($mybb->input['action'] == "rss" && $problog->settings['enable_rss'])
 	echo "<link>".$mybb->settings['bburl']."/blog.php</link>\n";
 	echo "<description>Latest blog posts</description>\n";
 
-	$query = $db->simple_select("blog_posts", "*", "enabled='1'", array("order_by" => "dateline", "order_dir" => "DESC", "limit" => (int)$problog->settings['rss_num_items']));
+	$query = $db->simple_select("blog_posts", "*", "enabled='1' AND dateline <= ".TIME_NOW, array("order_by" => "dateline", "order_dir" => "DESC", "limit" => (int)$problog->settings['rss_num_items']));
 	while($post = $db->fetch_array($query))
 	{
 		echo "<item>\n";
@@ -246,7 +259,7 @@ if($action == "search")
     $tag = $db->escape_string($mybb->input['tag']);
     $cid = (int)$mybb->input['cid'];
 
-    $where = "enabled='1'";
+    $where = "enabled='1' AND dateline <= ".TIME_NOW;
     if($keywords) $where .= " AND (title LIKE '%{$keywords}%' OR content LIKE '%{$keywords}%')";
     if($tag) $where .= " AND tags LIKE '%{$tag}%'";
     if($cid) $where .= " AND cid='{$cid}'";
@@ -273,7 +286,7 @@ elseif($action == "view")
 		SELECT p.*, u.username, u.avatar, u.avatardimensions
 		FROM ".TABLE_PREFIX."blog_posts p
 		LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid = p.uid)
-		WHERE p.pid='{$id}' AND p.enabled='1'
+		WHERE p.pid='{$id}' AND p.enabled='1' AND p.dateline <= ".TIME_NOW
 	");
 	$announcement = $db->fetch_array($query);
 	if($announcement)
@@ -283,6 +296,13 @@ elseif($action == "view")
 		$announcement['threadlink'] = "blog.php?action=view&id=".$announcement['pid'];
 		$profilelink = ($announcement['uid'] == 0) ? $lang->guest : build_profile_link($announcement['username'], $announcement['uid']);
 		$announcement['subject'] = htmlspecialchars_uni($parser->parse_badwords($announcement['title']));
+
+        // Post Image
+        $post_img = "";
+        if(!empty($announcement['image']))
+        {
+            $post_img = "<img src='blog/images/{$announcement['image']}' style='max-width: 100%; height: auto; display: block; margin: 10px 0;' /><br />";
+        }
 
         // Avatar
 		if($announcement['avatar'] != '')
@@ -304,9 +324,26 @@ elseif($action == "view")
 		$views = "<strong>{$announcement['views']}</strong> {$lang->latest_threads_views}";
         $likes = "<strong>{$announcement['likes']}</strong> Likes";
 
+        // User list who liked
+        $liked_by = "";
+        $lquery = $db->query("SELECT u.username FROM ".TABLE_PREFIX."blog_likes l LEFT JOIN ".TABLE_PREFIX."users u ON u.uid=l.uid WHERE l.pid='{$id}' LIMIT 5");
+        while($luser = $db->fetch_array($lquery)) $liked_by .= htmlspecialchars_uni($luser['username']).", ";
+        if($liked_by) $liked_by = "<br /><span class='smalltext'>Liked by: ".rtrim($liked_by, ", ")."</span>";
+
 		$parser_options = array("allow_html" => 0, "allow_mycode" => 1, "allow_smilies" => 1, "allow_imgcode" => 1, "filter_badwords" => 1);
-		$message = $parser->parse_message($announcement['content'], $parser_options);
+		$message = $post_img . $parser->parse_message($announcement['content'], $parser_options);
 		$icon = "&nbsp;";
+
+        // Social Buttons
+        $encoded_url = urlencode($mybb->settings['bburl']."/blog.php?action=view&id=".$id);
+        $encoded_title = urlencode($announcement['title']);
+        $social_buttons = "
+            <div style='margin-top: 15px;'>
+                <a href='https://twitter.com/intent/tweet?text={$encoded_title}&url={$encoded_url}' target='_blank' style='margin-right: 5px;'>Tweet</a>
+                <a href='https://www.facebook.com/sharer/sharer.php?u={$encoded_url}' target='_blank'>Share</a>
+            </div>
+        ";
+        $message .= $social_buttons;
 
         // Moderator Options
         $mod_options = "";
@@ -378,13 +415,13 @@ elseif($action == "archive")
     $per_page = (int)$problog->settings['archive_limit'];
     $start = ($page - 1) * $per_page;
 
-    $query = $db->simple_select("blog_posts", "COUNT(*) AS count", "enabled='1'");
+    $query = $db->simple_select("blog_posts", "COUNT(*) AS count", "enabled='1' AND dateline <= ".TIME_NOW);
     $count = $db->fetch_field($query, "count");
 
     $multipage = multipage($count, $per_page, $page, "blog.php?action=archive");
 
     $archive_bits = "";
-    $query = $db->simple_select("blog_posts", "*", "enabled='1'", array("order_by" => "dateline", "order_dir" => "DESC", "limit_start" => $start, "limit" => $per_page));
+    $query = $db->simple_select("blog_posts", "*", "enabled='1' AND dateline <= ".TIME_NOW, array("order_by" => "dateline", "order_dir" => "DESC", "limit_start" => $start, "limit" => $per_page));
     while($post = $db->fetch_array($query))
     {
         $post['date'] = my_date($mybb->settings['dateformat'], $post['dateline']);
@@ -428,13 +465,13 @@ elseif($action == "do_comment")
 }
 else
 {
-    // Index - Latest Posts with pagination
+    // Index - Featured first, then Latest Posts with pagination
     $page = (int)$mybb->input['page'];
     if($page < 1) $page = 1;
     $per_page = (int)$problog->settings['posts_per_page'];
     $start = ($page - 1) * $per_page;
 
-    $query = $db->simple_select("blog_posts", "COUNT(*) AS count", "enabled='1' AND archived='0'");
+    $query = $db->simple_select("blog_posts", "COUNT(*) AS count", "enabled='1' AND archived='0' AND dateline <= ".TIME_NOW);
     $count = $db->fetch_field($query, "count");
     $multipage = multipage($count, $per_page, $page, "blog.php");
 
@@ -442,8 +479,8 @@ else
         SELECT p.*, u.username, u.avatar, u.avatardimensions
         FROM ".TABLE_PREFIX."blog_posts p
         LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid = p.uid)
-        WHERE p.enabled='1' AND p.archived='0'
-        ORDER BY p.dateline DESC
+        WHERE p.enabled='1' AND p.archived='0' AND p.dateline <= ".TIME_NOW."
+        ORDER BY p.featured DESC, p.dateline DESC
         LIMIT {$start}, {$per_page}
     ");
 
@@ -453,7 +490,10 @@ else
 		$profilelink = ($announcement['uid'] == 0) ? $lang->guest : build_profile_link($announcement['username'], $announcement['uid']);
 		$announcement['subject'] = htmlspecialchars_uni($parser->parse_badwords($announcement['title']));
 
-        // Avatar logic (truncated for brevity in index)
+        // Featured Badge
+        if($announcement['featured']) $announcement['subject'] = "<span style='color:purple; font-size: 0.8em; vertical-align: middle; font-weight: bold;'>[FEATURED]</span> " . $announcement['subject'];
+
+        // Avatar
         $avatar = "";
         if($announcement['avatar'] != '')
         {
@@ -469,11 +509,17 @@ else
         $likes = "<strong>{$announcement['likes']}</strong> Likes";
 
 		$parser_options = array("allow_html" => 0, "allow_mycode" => 1, "allow_smilies" => 1, "allow_imgcode" => 1, "filter_badwords" => 1);
+
+        $post_img = "";
+        if(!empty($announcement['image']))
+            $post_img = "<img src='blog/images/{$announcement['image']}' style='max-width: 150px; float: left; margin-right: 15px; border-radius: 5px;' />";
+
         $content = $announcement['description'] ?: $announcement['content'];
-		$message = $parser->parse_message(my_substr($content, 0, $problog->settings['annmessagelength']), $parser_options);
+		$message = $post_img . $parser->parse_message(my_substr($content, 0, $problog->settings['annmessagelength']), $parser_options);
+        $message .= "<div style='clear:both;'></div>";
 		$icon = "&nbsp;";
 
-        $mod_options = $report_btn = $like_btn = ""; // Simplified for index
+        $mod_options = $report_btn = $like_btn = "";
         $closed_style = ($announcement['closed'] && $problog->settings['highlight_closed']) ? "background: {$problog->settings['closed_bgcolor']};" : "";
 
 		eval("\$centerblocks .= \"".$templates->get("pro_blog_announcement")."\";");
