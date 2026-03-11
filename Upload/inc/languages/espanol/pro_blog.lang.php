@@ -76,9 +76,10 @@ $l['search'] = "Buscar";
 $l['search_results'] = "Resultados de la Búsqueda";
 $l['no_results'] = "No se han encontrado resultados.";
 
-// Específicos de MyBlog
+// ProBlog Specific
 $l['blog_likes'] = "Me gusta";
 $l['blog_like'] = "Me gusta";
+$l['blog_unlike'] = "Ya no me gusta";
 $l['blog_report'] = "Reportar";
 $l['blog_comments'] = "Comentarios";
 $l['blog_post_comment'] = "Publicar un Comentario";
@@ -91,4 +92,19 @@ $l['blog_stats_latest'] = "Última:";
 $l['blog_stats_most_viewed'] = "Más Vista:";
 $l['blog_stats_most_liked'] = "Más Gustada:";
 $l['blog_stats_most_discussed'] = "Más Discutida:";
+
+$l['blog_na'] = "N/D";
+$l['blog_stats_entries'] = "Entradas:";
+$l['blog_stats_published'] = "Publicadas:";
+$l['blog_stats_today'] = "Hoy:";
+$l['blog_stats_drafts'] = "Borradores:";
+$l['blog_stats_rejected'] = "Rechazadas:";
+$l['blog_stats_pending'] = "Pendientes:";
+$l['blog_stats_organization'] = "Organización:";
+$l['blog_stats_categories'] = "Categorías:";
+$l['blog_stats_tags'] = "Etiquetas:";
+$l['blog_stats_visits'] = "Visitas:";
+$l['blog_stats_total'] = "Totales:";
+$l['blog_stats_top_entry'] = "Entrada top:";
+$l['blog_liked_by'] = "Gustado por:";
 ?>

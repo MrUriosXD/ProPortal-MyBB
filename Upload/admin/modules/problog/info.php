@@ -155,24 +155,48 @@ elseif(!$mybb->input['action'])
 		? "<span style='color: green;'>✅ MyBB {$current_version}</span>"
 		: "<span style='color: red;'>❌ MyBB {$current_version} (minimum {$required_version})</span>";
 
-	$tables_exist = $db->table_exists("blog_posts") && $db->table_exists("blog_categories") && $db->table_exists("blog_comments");
+    $today = strtotime("today");
 
-	if($tables_exist)
-	{
-		$total_posts      = (int)$db->fetch_field($db->simple_select("blog_posts", "COUNT(*)", ""), "COUNT(*)");
-		$total_categories = (int)$db->fetch_field($db->simple_select("blog_categories", "COUNT(*)", ""), "COUNT(*)");
-		$total_comments   = (int)$db->fetch_field($db->simple_select("blog_comments", "COUNT(*)", ""), "COUNT(*)");
-		$query = $db->simple_select("blog_posts", "SUM(views) AS total_views");
-		$total_views      = (int)$db->fetch_field($query, "total_views");
-	}
+    // Entries Stats
+    $entries = array();
+    $entries['total'] = (int)$db->fetch_field($db->simple_select("blog_posts", "COUNT(*) AS c", "enabled='1'"), "c");
+    $entries['today'] = (int)$db->fetch_field($db->simple_select("blog_posts", "COUNT(*) AS c", "enabled='1' AND dateline >= {$today}"), "c");
+    $entries['drafts'] = (int)$db->fetch_field($db->simple_select("blog_posts", "COUNT(*) AS c", "enabled='0'"), "c");
+    $entries['rejected'] = (int)$db->fetch_field($db->simple_select("blog_posts", "COUNT(*) AS c", "archived='1'"), "c"); // Using archived as proxy for rejected for UI
+
+    // Comments Stats
+    $comments = array();
+    $comments['total'] = (int)$db->fetch_field($db->simple_select("blog_comments", "COUNT(*) AS c"), "c");
+    $comments['today'] = (int)$db->fetch_field($db->simple_select("blog_comments", "COUNT(*) AS c", "dateline >= {$today}"), "c");
+    $comments['pending'] = (int)$db->fetch_field($db->simple_select("blog_reports", "COUNT(*) AS c", "is_read='0'"), "c"); // Reports as pending items
+    $comments['rejected'] = (int)$db->fetch_field($db->simple_select("blog_reports", "COUNT(*) AS c", "is_read='1'"), "c");
+
+    // Organization
+    $categories_stats = array();
+    $categories_stats['total'] = (int)$db->fetch_field($db->simple_select("blog_categories", "COUNT(*) AS c"), "c");
+
+    // Tags total (approximate from distinct tags)
+    $tags_query = $db->simple_select("blog_posts", "tags", "enabled='1'");
+    $tags_list = array();
+    while($row = $db->fetch_array($tags_query)) {
+        foreach(explode(",", $row['tags']) as $t) if(trim($t)) $tags_list[trim($t)] = 1;
+    }
+    $tags_total = count($tags_list);
+
+    // Views
+    $views = array();
+    $query = $db->simple_select("blog_posts", "SUM(views) AS total_views");
+    $views['total'] = (int)$db->fetch_field($query, "total_views");
+    $top_entry_query = $db->simple_select("blog_posts", "title", "enabled='1'", array("order_by" => "views", "order_dir" => "DESC", "limit" => 1));
+    $views['top_entry'] = $db->fetch_field($top_entry_query, "title") ?: $lang->blog_na;
 
 	// -------------------------
 	// Blog Information
 	// -------------------------
 	$table = new Table;
-	$table->construct_header("General", ['width' => '100%', 'colspan' => 2]);
-	$table->construct_header("Blocks (Active / Inactive)", ['width' => '100%', 'colspan' => 2]);
-	$table->construct_header("Blog Info (Active / Inactive)", ['width' => '100%', 'colspan' => 2]);
+	$table->construct_header("General", ['width' => '33%', 'colspan' => 2]);
+	$table->construct_header("Blocks (Active / Inactive)", ['width' => '33%', 'colspan' => 2]);
+	$table->construct_header("Detailed Info", ['width' => '33%', 'colspan' => 2]);
 
 	// Get blocks info
 	$query = $db->simple_select("blog_blocks", "COUNT(id) AS numblocks");
@@ -206,18 +230,29 @@ elseif(!$mybb->input['action'])
 				"Right: "			 		 . $rightblocksnum,
 		],
 		'right' => [
-			// Posts
-			"Posts:" =>
-				"Published: "				 . ($total_posts ?? 0) . "<br />" .
-				"Views: "					 . ($total_views ?? 0),
+			// Entries
+			"{$lang->blog_stats_entries}" =>
+				"{$lang->blog_stats_published} "				 . ($entries['total']        ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_today} "					 . ($entries['today']        ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_drafts} "					 . ($entries['drafts']       ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_rejected} "				 . ($entries['rejected']     ?? "{$lang->blog_na}"),
 
 			// Comments
-			"Comments:" =>
-				"Totals: "   				 . ($total_comments ?? 0),
+			"{$lang->blog_stats_comments}" =>
+				"{$lang->blog_stats_total} "   				 . ($comments['total']       ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_today} "					 . ($comments['today']       ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_pending} "					 . ($comments['pending']     ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_rejected} "				 . ($comments['rejected']    ?? "{$lang->blog_na}"),
 
-			// Categories
-			"Organization:" =>
-				"Categories: "				 . ($total_categories ?? 0),
+			// Organization
+			"{$lang->blog_stats_organization}" =>
+				"{$lang->blog_stats_categories} "				 . ($categories_stats['total']     ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_tags} "				     . ($tags_total           ?? "{$lang->blog_na}"),
+
+			// Visits
+			"{$lang->blog_stats_visits}" =>
+				"{$lang->blog_stats_total} "					 . ($views['total']          ?? "{$lang->blog_na}") . "<br />" .
+				"{$lang->blog_stats_top_entry} "				 . ($views['top_entry']     ?? "{$lang->blog_na}"),
 		]
 	];
 
@@ -283,3 +318,4 @@ elseif(!$mybb->input['action'])
 
 	$page->output_footer();
 }
+?>

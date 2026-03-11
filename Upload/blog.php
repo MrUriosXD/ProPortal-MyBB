@@ -97,13 +97,19 @@ if($mybb->input['action'] == "like" && $mybb->user['uid'] > 0)
 
 	$pid = (int)$mybb->input['pid'];
 	$query = $db->simple_select("blog_likes", "lid", "pid='{$pid}' AND uid='{$mybb->user['uid']}'");
-	if(!$db->fetch_field($query, "lid"))
+    $existing = $db->fetch_array($query);
+	if(!$existing)
 	{
 		$db->insert_query("blog_likes", array("pid" => $pid, "uid" => $mybb->user['uid'], "dateline" => TIME_NOW));
 		$db->write_query("UPDATE ".TABLE_PREFIX."blog_posts SET likes = likes + 1 WHERE pid = '{$pid}'");
+        echo $lang->blog_unlike;
 	}
-	$query = $db->simple_select("blog_posts", "likes", "pid='{$pid}'");
-	echo $db->fetch_field($query, "likes");
+    else
+    {
+        $db->delete_query("blog_likes", "lid='{$existing['lid']}'");
+        $db->write_query("UPDATE ".TABLE_PREFIX."blog_posts SET likes = likes - 1 WHERE pid = '{$pid}'");
+        echo $lang->blog_like;
+    }
 	exit;
 }
 
@@ -286,7 +292,7 @@ elseif($action == "view")
 		SELECT p.*, u.username, u.avatar, u.avatardimensions
 		FROM ".TABLE_PREFIX."blog_posts p
 		LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid = p.uid)
-		WHERE p.pid='{$id}' AND p.enabled='1' AND p.dateline <= ".TIME_NOW
+		WHERE p.pid='{$id}' AND p.enabled='1' AND p.dateline <= ".TIME_NOW."
 	");
 	$announcement = $db->fetch_array($query);
 	if($announcement)
@@ -322,13 +328,14 @@ elseif($action == "view")
 		$anntime = my_date($mybb->settings['timeformat'], $announcement['dateline']);
 		$numcomments = "- {$announcement['comments_count']} {$lang->replies}";
 		$views = "<strong>{$announcement['views']}</strong> {$lang->latest_threads_views}";
-        $likes = "<strong>{$announcement['likes']}</strong> Likes";
+        $likes = "<span id='likes_count_total'><strong>{$announcement['likes']}</strong></span> {$lang->blog_likes}";
 
         // User list who liked
         $liked_by = "";
         $lquery = $db->query("SELECT u.username FROM ".TABLE_PREFIX."blog_likes l LEFT JOIN ".TABLE_PREFIX."users u ON u.uid=l.uid WHERE l.pid='{$id}' LIMIT 5");
         while($luser = $db->fetch_array($lquery)) $liked_by .= htmlspecialchars_uni($luser['username']).", ";
-        if($liked_by) $liked_by = "<br /><span class='smalltext'>Liked by: ".rtrim($liked_by, ", ")."</span>";
+        if($liked_by) $liked_by = "<br /><span class='smalltext' id='liked_by_list'>{$lang->blog_liked_by} ".rtrim($liked_by, ", ")."</span>";
+        else $liked_by = "<br /><span class='smalltext' id='liked_by_list'></span>";
 
 		$parser_options = array("allow_html" => 0, "allow_mycode" => 1, "allow_smilies" => 1, "allow_imgcode" => 1, "filter_badwords" => 1);
 		$message = $post_img . $parser->parse_message($announcement['content'], $parser_options);
@@ -360,13 +367,22 @@ elseif($action == "view")
         $like_btn = "";
         $can_like = explode(",", $problog->settings['can_like_groups']);
         if(in_array($mybb->user['usergroup'], $can_like))
-            $like_btn = "<button onclick=\"$.post('blog.php', {action: 'like', pid: '{$id}'}, function(d){ $('#likes_count').text(d); });\">Like</button>";
+        {
+            $lquery = $db->simple_select("blog_likes", "lid", "pid='{$id}' AND uid='{$mybb->user['uid']}'");
+            $btn_text = $db->fetch_field($lquery, "lid") ? $lang->blog_unlike : $lang->blog_like;
+            $like_btn = "<button id='like_button_main' onclick=\"$.post('blog.php', {action: 'like', pid: '{$id}'}, function(d){
+                $('#like_button_main').text(d);
+                var c = parseInt($('#likes_count_total strong').text());
+                if(d == '{$lang->blog_like}') { c--; } else { c++; }
+                $('#likes_count_total strong').text(c);
+            });\">{$btn_text}</button>";
+        }
 
         // Report button
         $report_btn = "";
         $can_report = explode(",", $problog->settings['can_report_groups']);
         if(in_array($mybb->user['usergroup'], $can_report))
-			$report_btn = "<a href='blog.php?action=report&type=post&id={$id}'>Report</a>";
+			$report_btn = "<a href='blog.php?action=report&type=post&id={$id}'>{$lang->blog_report}</a>";
 
         // Closed style
         $closed_style = ($announcement['closed'] && $problog->settings['highlight_closed']) ? "background: {$problog->settings['closed_bgcolor']};" : "";
@@ -395,7 +411,7 @@ elseif($action == "view")
 		}
 
 		if(!$comment_list) $comment_list = "No comments yet.";
-		$centerblocks .= "<div id='comments' style='margin-top:20px;'><h2>Comments</h2>{$comment_list}</div>";
+		$centerblocks .= "<div id='comments' style='margin-top:20px;'><h2>{$lang->blog_comments}</h2>{$comment_list}</div>";
 
 		// Quick reply
         $can_comment = explode(",", $problog->settings['can_comment_groups']);
@@ -428,7 +444,7 @@ elseif($action == "archive")
         eval("\$archive_bits .= \"".$templates->get("pro_blog_archive_bit")."\";");
     }
 
-    add_breadcrumb("Archive");
+    add_breadcrumb($lang->blog_archive);
     eval("\$centerblocks = \"".$templates->get("pro_blog_archive")."\";");
 }
 elseif($action == "report")
@@ -506,7 +522,7 @@ else
 		$anntime = my_date($mybb->settings['timeformat'], $announcement['dateline']);
 		$numcomments = "- {$announcement['comments_count']} {$lang->replies}";
 		$views = "<strong>{$announcement['views']}</strong> {$lang->latest_threads_views}";
-        $likes = "<strong>{$announcement['likes']}</strong> Likes";
+        $likes = "<strong>{$announcement['likes']}</strong> {$lang->blog_likes}";
 
 		$parser_options = array("allow_html" => 0, "allow_mycode" => 1, "allow_smilies" => 1, "allow_imgcode" => 1, "filter_badwords" => 1);
 

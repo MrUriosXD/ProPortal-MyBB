@@ -37,4 +37,18 @@ $l['latest_version'] = "Latest Version";
 $l['blog_latest_news_description'] = "Latest news from the official ProBlog blog.";
 $l['no_announcements'] = "No news found. You can <a href=\"{1}\">check for updates</a> manually.";
 
+// Detailed stats
+$l['blog_stats_entries'] = "Entries:";
+$l['blog_stats_published'] = "Published:";
+$l['blog_stats_today'] = "Today:";
+$l['blog_stats_drafts'] = "Drafts:";
+$l['blog_stats_rejected'] = "Rejected:";
+$l['blog_stats_comments'] = "Comments:";
+$l['blog_stats_total'] = "Total:";
+$l['blog_stats_pending'] = "Pending:";
+$l['blog_stats_organization'] = "Organization:";
+$l['blog_stats_categories'] = "Categories:";
+$l['blog_stats_tags'] = "Tags:";
+$l['blog_stats_visits'] = "Visits:";
+$l['blog_stats_top_entry'] = "Top Entry:";
 ?>

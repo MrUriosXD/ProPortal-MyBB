@@ -158,7 +158,7 @@ if(!$mybb->input['action'])
 	$table = new Table;
 	$table->construct_header($lang->blog_posts_title);
 	$table->construct_header($lang->blog_posts_date, array("class" => "align_center", "width" => "150"));
-    $table->construct_header($lang->blog_posts_status, array("class" => "align_center", "width" => "100"));
+    $table->construct_header($lang->blog_posts_status, array("class" => "align_center", "width" => "150"));
 	$table->construct_header($lang->options, array("class" => "align_center", "width" => "150"));
 
 	$query = $db->simple_select("blog_posts", "*", "", array("order_by" => "dateline", "order_dir" => "DESC"));
@@ -168,15 +168,17 @@ if(!$mybb->input['action'])
 		$post['date'] = my_date($mybb->settings['dateformat'], $post['dateline']).", ".my_date($mybb->settings['timeformat'], $post['dateline']);
 
         $status = array();
-        if($post['enabled']) $status[] = "<span style='color:green'>Enabled</span>"; else $status[] = "<span style='color:red'>Disabled</span>";
-        if($post['closed']) $status[] = "<span style='color:orange'>Closed</span>";
-        if($post['archived']) $status[] = "<span style='color:blue'>Archived</span>";
-        if($post['featured']) $status[] = "<span style='color:purple; font-weight:bold;'>Featured</span>";
-        if($post['dateline'] > TIME_NOW) $status[] = "<span style='color:gray'>Scheduled</span>";
+        if($post['enabled']) $status[] = "<img src='styles/default/images/icons/bullet_green.png' title='Enabled' alt='Active' />";
+        else $status[] = "<img src='styles/default/images/icons/bullet_red.png' title='Disabled' alt='Inactive' />";
+
+        if($post['closed']) $status[] = "<img src='styles/default/images/icons/lock.png' title='Closed' alt='Closed' />";
+        if($post['archived']) $status[] = "<img src='styles/default/images/icons/folder.png' title='Archived' alt='Archived' />";
+        if($post['featured']) $status[] = "<img src='styles/default/images/icons/star.png' title='Featured' alt='Featured' />";
+        if($post['dateline'] > TIME_NOW) $status[] = "<img src='styles/default/images/icons/clock.png' title='Scheduled' alt='Scheduled' />";
 
 		$table->construct_cell($post['title']);
 		$table->construct_cell($post['date'], array("class" => "align_center"));
-        $table->construct_cell(implode("<br />", $status), array("class" => "align_center"));
+        $table->construct_cell(implode(" ", $status), array("class" => "align_center"));
 
 		$popup = new PopupMenu("post_{$post['pid']}", $lang->options);
 		$popup->add_item($lang->edit, "index.php?module=problog-posts&amp;action=edit&amp;pid={$post['pid']}");

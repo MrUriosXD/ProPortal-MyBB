@@ -38,6 +38,15 @@ if($mybb->input['action'] == "add" || $mybb->input['action'] == "edit")
 	$form_container->output_row($lang->blog_categories_name, $lang->blog_categories_name_desc, $form->generate_text_box('name', $category['name'], array('id' => 'name')), 'name');
 	$form_container->output_row($lang->blog_categories_description, $lang->blog_categories_description_desc, $form->generate_text_area('description', $category['description'], array('id' => 'description')), 'description');
 
+    // Parent Category selection
+    $query = $db->simple_select("blog_categories", "cid, name", "parent_id='0'".($category['cid'] ? " AND cid!='{$category['cid']}'" : ""), array("order_by" => "name", "order_dir" => "ASC"));
+    $parents = array('0' => "None (Top Level)");
+    while($parent = $db->fetch_array($query))
+    {
+        $parents[$parent['cid']] = $parent['name'];
+    }
+    $form_container->output_row("Parent Category", "Select a parent category if this is a subcategory.", $form->generate_select_box('parent_id', $parents, $category['parent_id'], array('id' => 'parent_id')), 'parent_id');
+
 	$form_container->end();
 
 	$buttons[] = $form->generate_submit_button($lang->save);
@@ -58,6 +67,7 @@ if($mybb->input['action'] == "do_add")
 	$category_data = array(
 		"name" => $db->escape_string($mybb->input['name']),
 		"description" => $db->escape_string($mybb->input['description']),
+        "parent_id" => (int)$mybb->input['parent_id']
 	);
 
 	if($mybb->input['edit'])
@@ -76,13 +86,14 @@ if($mybb->input['action'] == "do_add")
 
 if($mybb->input['action'] == "delete")
 {
-	if(!verify_post_check($mybb->input['my_post_key']))
+    if(!verify_post_check($mybb->input['my_post_key']))
 	{
 		flash_message($lang->invalid_post_verify_key2, 'error');
 		admin_redirect("index.php?module=problog-categories");
 	}
 
 	$db->delete_query("blog_categories", "cid='".(int)$mybb->input['cid']."'");
+    $db->update_query("blog_categories", array("parent_id" => 0), "parent_id='".(int)$mybb->input['cid']."'");
 	flash_message($lang->blog_categories_success_deleted, 'success');
 	admin_redirect("index.php?module=problog-categories");
 }
@@ -107,17 +118,26 @@ if(!$mybb->input['action'])
 	$table->construct_header($lang->blog_categories_name);
 	$table->construct_header($lang->options, array("class" => "align_center", "width" => "150"));
 
-	$query = $db->simple_select("blog_categories", "*", "", array("order_by" => "name", "order_dir" => "ASC"));
-	while($category = $db->fetch_array($query))
-	{
-		$table->construct_cell(htmlspecialchars_uni($category['name']));
+    function build_category_tree($parent_id = 0, $depth = 0)
+    {
+        global $db, $table, $lang, $mybb;
+        $query = $db->simple_select("blog_categories", "*", "parent_id='{$parent_id}'", array("order_by" => "name", "order_dir" => "ASC"));
+        while($category = $db->fetch_array($query))
+        {
+            $prefix = str_repeat("-- ", $depth);
+            $table->construct_cell($prefix . htmlspecialchars_uni($category['name']));
 
-		$popup = new PopupMenu("category_{$category['cid']}", $lang->options);
-		$popup->add_item($lang->edit, "index.php?module=problog-categories&amp;action=edit&amp;cid={$category['cid']}");
-		$popup->add_item($lang->delete, "index.php?module=problog-categories&amp;action=delete&amp;cid={$category['cid']}&amp;my_post_key={$mybb->post_code}", "return confirm('{$lang->blog_categories_confirm_delete}')");
-		$table->construct_cell($popup->fetch(), array("class" => "align_center"));
-		$table->construct_row();
-	}
+            $popup = new PopupMenu("category_{$category['cid']}", $lang->options);
+            $popup->add_item($lang->edit, "index.php?module=problog-categories&amp;action=edit&amp;cid={$category['cid']}");
+            $popup->add_item($lang->delete, "index.php?module=problog-categories&amp;action=delete&amp;cid={$category['cid']}&amp;my_post_key={$mybb->post_code}", "return confirm('{$lang->blog_categories_confirm_delete}')");
+            $table->construct_cell($popup->fetch(), array("class" => "align_center"));
+            $table->construct_row();
+
+            build_category_tree($category['cid'], $depth + 1);
+        }
+    }
+
+	build_category_tree(0, 0);
 
 	if($table->num_rows() == 0)
 	{
